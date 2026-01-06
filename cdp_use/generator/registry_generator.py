@@ -75,7 +75,6 @@ class RegistryGenerator:
         content += '        """\n'
         content += "        if method in self._handlers:\n"
         content += "            try:\n"
-        content += "                import asyncio\n"
         content += "                import inspect\n"
         content += "                handler = self._handlers[method]\n\n"
         content += "                # Check if handler is async\n"

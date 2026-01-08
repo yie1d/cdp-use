@@ -50,11 +50,11 @@ class RegistrationLibraryGenerator:
         content += '"""CDP Event Registration Library"""\n\n'
 
         # Basic imports
-        content += "from typing import TYPE_CHECKING\n\n"
+        content += "from typing import TYPE_CHECKING, Optional\n\n"
 
         # TYPE_CHECKING section for EventRegistry and domain registrations
         content += "if TYPE_CHECKING:\n"
-        content += "    from .registry import EventRegistry\n"
+        content += "    from .registry import EventRegistry, EventHandler\n"
         for domain_info in self.domain_registrations:
             domain_lower = domain_info["lower_name"]
             registration_class_name = domain_info["class_name"]
@@ -64,8 +64,9 @@ class RegistrationLibraryGenerator:
         # Generate main registration library class
         content += "class CDPRegistrationLibrary:\n"
         content += '    """Main CDP registration library with domain-specific registration interfaces."""\n\n'
-        content += "    def __init__(self, registry: 'EventRegistry'):\n"
+        content += "    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):\n"
         content += "        self._registry = registry\n"
+        content += "        self._mode = mode  # 'register' or 'unregister'\n"
 
         # Add properties for each domain registration (lazy imports to avoid circular dependencies)
         for domain_info in self.domain_registrations:
@@ -77,7 +78,7 @@ class RegistrationLibraryGenerator:
             content += (
                 f"        from .{domain_lower}.registration import {registration_class_name}\n"
             )
-            content += f"        self.{domain_name} = {registration_class_name}(registry)\n"
+            content += f"        self.{domain_name} = {registration_class_name}(self._registry, self._mode)\n"
 
         content += "\n"
 

@@ -250,7 +250,10 @@ class CDPClient:
         self.send: "CDPLibrary" = CDPLibrary(self)
         self._event_registry: "EventRegistry" = EventRegistry()
         self.register: "CDPRegistrationLibrary" = CDPRegistrationLibrary(
-            self._event_registry
+            self._event_registry, "register"
+        )
+        self.unregister: "CDPRegistrationLibrary" = CDPRegistrationLibrary(
+            self._event_registry, "unregister"
         )
 
     async def __aenter__(self):

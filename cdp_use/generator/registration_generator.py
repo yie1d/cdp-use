@@ -82,15 +82,16 @@ class RegistrationGenerator:
                 import_line += ")"
             self.type_checking_imports.add(import_line)
 
-        self.type_checking_imports.add("from ..registry import EventRegistry")
+        self.type_checking_imports.add("from ..registry import EventRegistry, EventHandler")
 
         content = f"class {class_name}:\n"
         content += (
             f'    """Event registration interface for {domain_name} domain."""\n\n'
         )
-        content += "    def __init__(self, registry: 'EventRegistry'):\n"
+        content += "    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):\n"
         content += "        self._registry = registry\n"
-        content += f'        self._domain = "{domain_name}"\n\n'
+        content += f'        self._domain = "{domain_name}"\n'
+        content += "        self._mode = mode  # 'register' or 'unregister'\n\n"
 
         # Generate registration methods for each event
         for event in events:
@@ -117,7 +118,7 @@ class RegistrationGenerator:
             f"]"
         )
 
-        # Generate main registration method with once parameter
+        # Generate method that works for both register and unregister modes
         content = f"    def {method_name}(\n"
         content += "        self,\n"
         content += f"        callback: {callback_type},\n"
@@ -129,26 +130,39 @@ class RegistrationGenerator:
         if description:
             escaped_desc = description.replace("\\", "\\\\").replace('"', '\\"')
             content += '        """\n'
-            content += f"        Register a callback for {event_name} events.\n"
+            content += f"        Register or unregister a callback for {event_name} events.\n"
             content += "        \n"
             content += f"        {escaped_desc}\n"
             content += "        \n"
             content += "        Args:\n"
             content += "            callback: Function to call when event occurs.\n"
             content += "                     Receives (event_data, session_id) as parameters.\n"
-            content += "            once: If True, callback will be removed after first execution.\n"
+            content += "            once: If True, callback will be removed after first execution (register mode only).\n"
+            content += "        \n"
+            content += "        Note:\n"
+            content += "            The behavior depends on the mode:\n"
+            content += "            - register mode: Adds the callback\n"
+            content += "            - unregister mode: Removes the callback (once parameter is ignored)\n"
             content += '        """\n'
         else:
             content += '        """\n'
-            content += f"        Register a callback for {event_name} events.\n"
+            content += f"        Register or unregister a callback for {event_name} events.\n"
             content += "        \n"
             content += "        Args:\n"
             content += "            callback: Function to call when event occurs.\n"
             content += "                     Receives (event_data, session_id) as parameters.\n"
-            content += "            once: If True, callback will be removed after first execution.\n"
+            content += "            once: If True, callback will be removed after first execution (register mode only).\n"
+            content += "        \n"
+            content += "        Note:\n"
+            content += "            The behavior depends on the mode:\n"
+            content += "            - register mode: Adds the callback\n"
+            content += "            - unregister mode: Removes the callback (once parameter is ignored)\n"
             content += '        """\n'
 
-        content += f'        self._registry.register("{cdp_method_name}", callback, once)\n'
+        content += "        if self._mode == 'register':\n"
+        content += f'            self._registry.register("{cdp_method_name}", callback, once)\n'
+        content += "        else:  # unregister mode\n"
+        content += f'            self._registry.unregister("{cdp_method_name}", callback)\n'
 
         return content
 

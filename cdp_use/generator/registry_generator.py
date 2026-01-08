@@ -20,20 +20,31 @@ class RegistryGenerator:
 """
         content += '"""CDP Event Registry"""\n\n'
         
+        content += "import asyncio\n"
+        content += "import inspect\n"
         content += "import logging\n"
-        content += "from typing import Any, Callable, Dict, Optional\n\n"
+        content += "from typing import Any, Callable, Dict, List, Optional, Tuple, Union\n"
+        content += "from collections.abc import Awaitable\n\n"
         
         content += "logger = logging.getLogger(__name__)\n\n"
+        
+        content += "# Type alias for event handlers that can be sync or async\n"
+        content += "EventHandler = Union[\n"
+        content += "    Callable[[Any, Optional[str]], None],\n"
+        content += "    Callable[[Any, Optional[str]], Awaitable[None]],\n"
+        content += "]\n\n"
         
         content += "class EventRegistry:\n"
         content += '    """Central registry for managing CDP event callbacks."""\n\n'
         content += "    def __init__(self):\n"
-        content += "        self._handlers: Dict[str, Callable[[Any, Optional[str]], None]] = {}\n\n"
+        content += "        # Store handlers as list of (callback, is_once) tuples to support multiple listeners\n"
+        content += "        self._handlers: Dict[str, List[Tuple[EventHandler, bool]]] = {}\n\n"
         
         content += "    def register(\n"
         content += "        self,\n"
         content += "        method: str,\n"
-        content += "        callback: Callable[[Any, Optional[str]], None],\n"
+        content += "        callback: EventHandler,\n"
+        content += "        once: bool = False,\n"
         content += "    ) -> None:\n"
         content += '        """\n'
         content += '        Register a callback for a specific CDP event method.\n'
@@ -42,19 +53,43 @@ class RegistryGenerator:
         content += '            method: The CDP method name (e.g., "Page.frameAttached")\n'
         content += '            callback: Function to call when event occurs.\n'
         content += '                     Receives (event_data, session_id) as parameters.\n'
+        content += '            once: If True, the callback will be automatically removed after first execution.\n'
         content += '        """\n'
-        content += '        logger.debug(f"Registering handler for {method}")\n'
-        content += "        self._handlers[method] = callback\n\n"
+        content += '        logger.debug(f"Registering handler for {method} (once={once})")\n'
+        content += "        if method not in self._handlers:\n"
+        content += "            self._handlers[method] = []\n"
+        content += "        self._handlers[method].append((callback, once))\n\n"
         
-        content += "    def unregister(self, method: str) -> None:\n"
+        content += "    def unregister(\n"
+        content += "        self,\n"
+        content += "        method: str,\n"
+        content += "        callback: Optional[EventHandler] = None,\n"
+        content += "    ) -> None:\n"
         content += '        """\n'
         content += '        Unregister a callback for a specific CDP event method.\n'
         content += '        \n'
         content += '        Args:\n'
         content += '            method: The CDP method name to unregister\n'
+        content += '            callback: Specific callback to remove. If None, removes all callbacks for this method.\n'
         content += '        """\n'
-        content += '        logger.debug(f"Unregistering handler for {method}")\n'
-        content += "        self._handlers.pop(method, None)\n\n"
+        content += "        if method not in self._handlers:\n"
+        content += "            return\n"
+        content += "        \n"
+        content += "        if callback is None:\n"
+        content += "            # Remove all handlers for this method\n"
+        content += '            logger.debug(f"Unregistering all handlers for {method}")\n'
+        content += "            del self._handlers[method]\n"
+        content += "        else:\n"
+        content += "            # Remove specific callback\n"
+        content += "            self._handlers[method] = [\n"
+        content += "                (cb, once) for cb, once in self._handlers[method]\n"
+        content += "                if cb != callback\n"
+        content += "            ]\n"
+        content += '            logger.debug(f"Unregistered specific handler for {method}")\n'
+        content += "            \n"
+        content += "            # Clean up empty list\n"
+        content += "            if not self._handlers[method]:\n"
+        content += "                del self._handlers[method]\n\n"
         
         content += "    async def handle_event(\n"
         content += "        self,\n"
@@ -73,11 +108,14 @@ class RegistryGenerator:
         content += '        Returns:\n'
         content += '            True if a handler was found and called, False otherwise\n'
         content += '        """\n'
-        content += "        if method in self._handlers:\n"
+        content += "        if method not in self._handlers:\n"
+        content += "            return False\n"
+        content += "        \n"
+        content += "        # Track indices of one-time handlers to remove after execution\n"
+        content += "        handlers_to_remove = []\n"
+        content += "        \n"
+        content += "        for i, (handler, is_once) in enumerate(self._handlers[method]):\n"
         content += "            try:\n"
-        content += "                import asyncio\n"
-        content += "                import inspect\n"
-        content += "                handler = self._handlers[method]\n\n"
         content += "                # Check if handler is async\n"
         content += "                if inspect.iscoroutinefunction(handler):\n"
         content += "                    # Run handler in background to avoid blocking the message receive loop.\n"
@@ -87,11 +125,22 @@ class RegistryGenerator:
         content += "                else:\n"
         content += "                    # Call sync handlers directly\n"
         content += "                    handler(params, session_id)\n"
-        content += "                return True\n"
+        content += "                \n"
+        content += "                # Mark one-time handler for removal\n"
+        content += "                if is_once:\n"
+        content += "                    handlers_to_remove.append(i)\n"
         content += "            except Exception as e:\n"
-        content += '                logger.error(f"Error in event handler for {method}: {e}")\n'
-        content += "                return False\n"
-        content += "        return False\n\n"
+        content += '                logger.error(f"Error in event handler for {method}: {e}", exc_info=True)\n'
+        content += "        \n"
+        content += "        # Remove one-time handlers (iterate in reverse to avoid index issues)\n"
+        content += "        for i in reversed(handlers_to_remove):\n"
+        content += "            self._handlers[method].pop(i)\n"
+        content += "        \n"
+        content += "        # Clean up empty handler list\n"
+        content += "        if method in self._handlers and not self._handlers[method]:\n"
+        content += "            del self._handlers[method]\n"
+        content += "        \n"
+        content += "        return True\n\n"
         
         content += "    def clear(self) -> None:\n"
         content += '        """Clear all registered handlers."""\n'

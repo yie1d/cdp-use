@@ -4,9 +4,8 @@
 
 """CDP Autofill Domain Types"""
 
-from typing import List
-from typing_extensions import Literal
-from typing_extensions import TypedDict
+from typing import List, TypedDict
+from typing import Literal
 
 from typing import TYPE_CHECKING
 
@@ -30,7 +29,9 @@ class CreditCard(TypedDict):
 
 class AddressField(TypedDict):
     name: "str"
-    """address field name, for example GIVEN_NAME."""
+    """address field name, for example GIVEN_NAME.
+The full list of supported field names:
+https://source.chromium.org/chromium/chromium/src/+/main:components/autofill/core/browser/field_types.cc;l=38"""
     value: "str"
     """address field value, for example Jon Doe."""
 

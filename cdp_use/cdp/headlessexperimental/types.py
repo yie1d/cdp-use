@@ -4,7 +4,7 @@
 
 """CDP HeadlessExperimental Domain Types"""
 
-from typing_extensions import TypedDict
+from typing import TypedDict
 
 class ScreenshotParams(TypedDict, total=False):
     """Encoding options for a screenshot."""

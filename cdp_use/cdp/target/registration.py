@@ -4,7 +4,8 @@
 
 """CDP Target Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -23,31 +24,43 @@ if TYPE_CHECKING:
 class TargetRegistration:
     """Event registration interface for Target domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Target"
+        self._mode = mode  # 'register' or 'unregister'
 
     def attachedToTarget(
         self,
-        callback: Callable[['AttachedToTargetEvent', Optional[str]], None],
+        callback: Union[Callable[['AttachedToTargetEvent', Optional[str]], None], Callable[['AttachedToTargetEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for attachedToTarget events.
+        Register or unregister a callback for attachedToTarget events.
         
         Issued when attached to target because of auto-attach or `attachToTarget` command.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Target.attachedToTarget", callback)
+        if self._mode == 'register':
+            self._registry.register("Target.attachedToTarget", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Target.attachedToTarget", callback)
 
     def detachedFromTarget(
         self,
-        callback: Callable[['DetachedFromTargetEvent', Optional[str]], None],
+        callback: Union[Callable[['DetachedFromTargetEvent', Optional[str]], None], Callable[['DetachedFromTargetEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for detachedFromTarget events.
+        Register or unregister a callback for detachedFromTarget events.
         
         Issued when detached from target for any reason (including `detachFromTarget` command). Can be
 issued multiple times per target if multiple sessions have been attached to it.
@@ -55,15 +68,25 @@ issued multiple times per target if multiple sessions have been attached to it.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Target.detachedFromTarget", callback)
+        if self._mode == 'register':
+            self._registry.register("Target.detachedFromTarget", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Target.detachedFromTarget", callback)
 
     def receivedMessageFromTarget(
         self,
-        callback: Callable[['ReceivedMessageFromTargetEvent', Optional[str]], None],
+        callback: Union[Callable[['ReceivedMessageFromTargetEvent', Optional[str]], None], Callable[['ReceivedMessageFromTargetEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for receivedMessageFromTarget events.
+        Register or unregister a callback for receivedMessageFromTarget events.
         
         Notifies about a new protocol message received from the session (as reported in
 `attachedToTarget` event).
@@ -71,60 +94,100 @@ issued multiple times per target if multiple sessions have been attached to it.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Target.receivedMessageFromTarget", callback)
+        if self._mode == 'register':
+            self._registry.register("Target.receivedMessageFromTarget", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Target.receivedMessageFromTarget", callback)
 
     def targetCreated(
         self,
-        callback: Callable[['TargetCreatedEvent', Optional[str]], None],
+        callback: Union[Callable[['TargetCreatedEvent', Optional[str]], None], Callable[['TargetCreatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for targetCreated events.
+        Register or unregister a callback for targetCreated events.
         
         Issued when a possible inspection target is created.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Target.targetCreated", callback)
+        if self._mode == 'register':
+            self._registry.register("Target.targetCreated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Target.targetCreated", callback)
 
     def targetDestroyed(
         self,
-        callback: Callable[['TargetDestroyedEvent', Optional[str]], None],
+        callback: Union[Callable[['TargetDestroyedEvent', Optional[str]], None], Callable[['TargetDestroyedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for targetDestroyed events.
+        Register or unregister a callback for targetDestroyed events.
         
         Issued when a target is destroyed.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Target.targetDestroyed", callback)
+        if self._mode == 'register':
+            self._registry.register("Target.targetDestroyed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Target.targetDestroyed", callback)
 
     def targetCrashed(
         self,
-        callback: Callable[['TargetCrashedEvent', Optional[str]], None],
+        callback: Union[Callable[['TargetCrashedEvent', Optional[str]], None], Callable[['TargetCrashedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for targetCrashed events.
+        Register or unregister a callback for targetCrashed events.
         
         Issued when a target has crashed.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Target.targetCrashed", callback)
+        if self._mode == 'register':
+            self._registry.register("Target.targetCrashed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Target.targetCrashed", callback)
 
     def targetInfoChanged(
         self,
-        callback: Callable[['TargetInfoChangedEvent', Optional[str]], None],
+        callback: Union[Callable[['TargetInfoChangedEvent', Optional[str]], None], Callable[['TargetInfoChangedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for targetInfoChanged events.
+        Register or unregister a callback for targetInfoChanged events.
         
         Issued when some information about a target has changed. This only happens between
 `targetCreated` and `targetDestroyed`.
@@ -132,6 +195,15 @@ issued multiple times per target if multiple sessions have been attached to it.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Target.targetInfoChanged", callback)
+        if self._mode == 'register':
+            self._registry.register("Target.targetInfoChanged", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Target.targetInfoChanged", callback)
 

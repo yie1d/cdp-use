@@ -4,9 +4,8 @@
 
 """CDP Audits Domain Types"""
 
-from typing import List
-from typing_extensions import Literal
-from typing_extensions import NotRequired, TypedDict
+from typing import List, NotRequired, TypedDict
+from typing import Literal
 
 from typing import TYPE_CHECKING
 
@@ -228,11 +227,15 @@ AttributionReportingIssueType = Literal["PermissionPolicyDisabled", "Untrustwort
 
 
 
-SharedDictionaryError = Literal["UseErrorCrossOriginNoCorsRequest", "UseErrorDictionaryLoadFailure", "UseErrorMatchingDictionaryNotUsed", "UseErrorUnexpectedContentDictionaryHeader", "WriteErrorCossOriginNoCorsRequest", "WriteErrorDisallowedBySettings", "WriteErrorExpiredResponse", "WriteErrorFeatureDisabled", "WriteErrorInsufficientResources", "WriteErrorInvalidMatchField", "WriteErrorInvalidStructuredHeader", "WriteErrorNavigationRequest", "WriteErrorNoMatchField", "WriteErrorNonListMatchDestField", "WriteErrorNonSecureContext", "WriteErrorNonStringIdField", "WriteErrorNonStringInMatchDestList", "WriteErrorNonStringMatchField", "WriteErrorNonTokenTypeField", "WriteErrorRequestAborted", "WriteErrorShuttingDown", "WriteErrorTooLongIdField", "WriteErrorUnsupportedType"]
+SharedDictionaryError = Literal["UseErrorCrossOriginNoCorsRequest", "UseErrorDictionaryLoadFailure", "UseErrorMatchingDictionaryNotUsed", "UseErrorUnexpectedContentDictionaryHeader", "WriteErrorCossOriginNoCorsRequest", "WriteErrorDisallowedBySettings", "WriteErrorExpiredResponse", "WriteErrorFeatureDisabled", "WriteErrorInsufficientResources", "WriteErrorInvalidMatchField", "WriteErrorInvalidStructuredHeader", "WriteErrorInvalidTTLField", "WriteErrorNavigationRequest", "WriteErrorNoMatchField", "WriteErrorNonIntegerTTLField", "WriteErrorNonListMatchDestField", "WriteErrorNonSecureContext", "WriteErrorNonStringIdField", "WriteErrorNonStringInMatchDestList", "WriteErrorNonStringMatchField", "WriteErrorNonTokenTypeField", "WriteErrorRequestAborted", "WriteErrorShuttingDown", "WriteErrorTooLongIdField", "WriteErrorUnsupportedType"]
 
 
 
 SRIMessageSignatureError = Literal["MissingSignatureHeader", "MissingSignatureInputHeader", "InvalidSignatureHeader", "InvalidSignatureInputHeader", "SignatureHeaderValueIsNotByteSequence", "SignatureHeaderValueIsParameterized", "SignatureHeaderValueIsIncorrectLength", "SignatureInputHeaderMissingLabel", "SignatureInputHeaderValueNotInnerList", "SignatureInputHeaderValueMissingComponents", "SignatureInputHeaderInvalidComponentType", "SignatureInputHeaderInvalidComponentName", "SignatureInputHeaderInvalidHeaderComponentParameter", "SignatureInputHeaderInvalidDerivedComponentParameter", "SignatureInputHeaderKeyIdLength", "SignatureInputHeaderInvalidParameter", "SignatureInputHeaderMissingRequiredParameters", "ValidationFailedSignatureExpired", "ValidationFailedInvalidLength", "ValidationFailedSignatureMismatch", "ValidationFailedIntegrityMismatch"]
+
+
+
+UnencodedDigestError = Literal["MalformedDictionary", "UnknownAlgorithm", "IncorrectDigestType", "IncorrectDigestLength"]
 
 
 
@@ -281,7 +284,13 @@ class SRIMessageSignatureIssueDetails(TypedDict):
 
 
 
-GenericIssueErrorType = Literal["FormLabelForNameError", "FormDuplicateIdForInputError", "FormInputWithNoLabelError", "FormAutocompleteAttributeEmptyError", "FormEmptyIdAndNameAttributesForInputError", "FormAriaLabelledByToNonExistingId", "FormInputAssignedAutocompleteValueToIdOrNameAttributeError", "FormLabelHasNeitherForNorNestedInput", "FormLabelForMatchesNonExistingIdError", "FormInputHasWrongButWellIntendedAutocompleteValueError", "ResponseWasBlockedByORB"]
+class UnencodedDigestIssueDetails(TypedDict):
+    error: "UnencodedDigestError"
+    request: "AffectedRequest"
+
+
+
+GenericIssueErrorType = Literal["FormLabelForNameError", "FormDuplicateIdForInputError", "FormInputWithNoLabelError", "FormAutocompleteAttributeEmptyError", "FormEmptyIdAndNameAttributesForInputError", "FormAriaLabelledByToNonExistingIdError", "FormInputAssignedAutocompleteValueToIdOrNameAttributeError", "FormLabelHasNeitherForNorNestedInputError", "FormLabelForMatchesNonExistingIdError", "FormInputHasWrongButWellIntendedAutocompleteValueError", "ResponseWasBlockedByORB", "NavigationEntryMarkedSkippable", "AutofillAndManualTextPolicyControlledFeaturesInfo", "AutofillPolicyControlledFeatureInfo", "ManualTextPolicyControlledFeatureInfo"]
 
 
 
@@ -438,7 +447,7 @@ registrations being ignored."""
 
 
 
-UserReidentificationIssueType = Literal["BlockedFrameNavigation", "BlockedSubresource"]
+UserReidentificationIssueType = Literal["BlockedFrameNavigation", "BlockedSubresource", "NoisedCanvasReadback"]
 
 
 
@@ -449,10 +458,38 @@ re-identify users."""
     type: "UserReidentificationIssueType"
     request: "NotRequired[AffectedRequest]"
     """Applies to BlockedFrameNavigation and BlockedSubresource issue types."""
+    sourceCodeLocation: "NotRequired[SourceCodeLocation]"
+    """Applies to NoisedCanvasReadback issue type."""
 
 
 
-InspectorIssueCode = Literal["CookieIssue", "MixedContentIssue", "BlockedByResponseIssue", "HeavyAdIssue", "ContentSecurityPolicyIssue", "SharedArrayBufferIssue", "LowTextContrastIssue", "CorsIssue", "AttributionReportingIssue", "QuirksModeIssue", "PartitioningBlobURLIssue", "NavigatorUserAgentIssue", "GenericIssue", "DeprecationIssue", "ClientHintIssue", "FederatedAuthRequestIssue", "BounceTrackingIssue", "CookieDeprecationMetadataIssue", "StylesheetLoadingIssue", "FederatedAuthUserInfoRequestIssue", "PropertyRuleIssue", "SharedDictionaryIssue", "ElementAccessibilityIssue", "SRIMessageSignatureIssue", "UserReidentificationIssue"]
+PermissionElementIssueType = Literal["InvalidType", "FencedFrameDisallowed", "CspFrameAncestorsMissing", "PermissionsPolicyBlocked", "PaddingRightUnsupported", "PaddingBottomUnsupported", "InsetBoxShadowUnsupported", "RequestInProgress", "UntrustedEvent", "RegistrationFailed", "TypeNotSupported", "InvalidTypeActivation", "SecurityChecksFailed", "ActivationDisabled", "GeolocationDeprecated", "InvalidDisplayStyle", "NonOpaqueColor", "LowContrast", "FontSizeTooSmall", "FontSizeTooLarge", "InvalidSizeValue"]
+
+
+
+class PermissionElementIssueDetails(TypedDict):
+    """This issue warns about improper usage of the <permission> element."""
+
+    issueType: "PermissionElementIssueType"
+    type: "NotRequired[str]"
+    """The value of the type attribute."""
+    nodeId: "NotRequired[BackendNodeId]"
+    """The node ID of the <permission> element."""
+    isWarning: "NotRequired[bool]"
+    """True if the issue is a warning, false if it is an error."""
+    permissionName: "NotRequired[str]"
+    """Fields for message construction:
+Used for messages that reference a specific permission name"""
+    occluderNodeInfo: "NotRequired[str]"
+    """Used for messages about occlusion"""
+    occluderParentNodeInfo: "NotRequired[str]"
+    """Used for messages about occluder's parent"""
+    disableReason: "NotRequired[str]"
+    """Used for messages about activation disabled reason"""
+
+
+
+InspectorIssueCode = Literal["CookieIssue", "MixedContentIssue", "BlockedByResponseIssue", "HeavyAdIssue", "ContentSecurityPolicyIssue", "SharedArrayBufferIssue", "LowTextContrastIssue", "CorsIssue", "AttributionReportingIssue", "QuirksModeIssue", "PartitioningBlobURLIssue", "NavigatorUserAgentIssue", "GenericIssue", "DeprecationIssue", "ClientHintIssue", "FederatedAuthRequestIssue", "BounceTrackingIssue", "CookieDeprecationMetadataIssue", "StylesheetLoadingIssue", "FederatedAuthUserInfoRequestIssue", "PropertyRuleIssue", "SharedDictionaryIssue", "ElementAccessibilityIssue", "SRIMessageSignatureIssue", "UnencodedDigestIssue", "UserReidentificationIssue", "PermissionElementIssue"]
 """A unique identifier for the type of issue. Each type may use one of the
 optional fields in InspectorIssueDetails to convey more specific
 information about the kind of issue."""
@@ -488,7 +525,9 @@ add a new optional field to this type."""
     sharedDictionaryIssueDetails: "SharedDictionaryIssueDetails"
     elementAccessibilityIssueDetails: "ElementAccessibilityIssueDetails"
     sriMessageSignatureIssueDetails: "SRIMessageSignatureIssueDetails"
+    unencodedDigestIssueDetails: "UnencodedDigestIssueDetails"
     userReidentificationIssueDetails: "UserReidentificationIssueDetails"
+    permissionElementIssueDetails: "PermissionElementIssueDetails"
 
 
 

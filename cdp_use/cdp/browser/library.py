@@ -43,7 +43,7 @@ class BrowserClient:
         params: "SetPermissionParameters",
         session_id: Optional[str] = None,
     ) -> "Dict[str, Any]":
-        """Set permission settings for given origin."""
+        """Set permission settings for given embedding and embedded origins."""
         return cast("Dict[str, Any]", await self._client.send_raw(
             method="Browser.setPermission",
             params=params,
@@ -55,7 +55,8 @@ class BrowserClient:
         params: "GrantPermissionsParameters",
         session_id: Optional[str] = None,
     ) -> "Dict[str, Any]":
-        """Grant specific permissions to the given origin and reject all others."""
+        """Grant specific permissions to the given origin and reject all others. Deprecated. Use
+setPermission instead."""
         return cast("Dict[str, Any]", await self._client.send_raw(
             method="Browser.grantPermissions",
             params=params,

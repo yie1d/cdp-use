@@ -4,7 +4,8 @@
 
 """CDP DOMStorage Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,59 +16,100 @@ if TYPE_CHECKING:
 class DOMStorageRegistration:
     """Event registration interface for DOMStorage domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "DOMStorage"
+        self._mode = mode  # 'register' or 'unregister'
 
     def domStorageItemAdded(
         self,
-        callback: Callable[['DomStorageItemAddedEvent', Optional[str]], None],
+        callback: Union[Callable[['DomStorageItemAddedEvent', Optional[str]], None], Callable[['DomStorageItemAddedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for domStorageItemAdded events.
+        Register or unregister a callback for domStorageItemAdded events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOMStorage.domStorageItemAdded", callback)
+        if self._mode == 'register':
+            self._registry.register("DOMStorage.domStorageItemAdded", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOMStorage.domStorageItemAdded", callback)
 
     def domStorageItemRemoved(
         self,
-        callback: Callable[['DomStorageItemRemovedEvent', Optional[str]], None],
+        callback: Union[Callable[['DomStorageItemRemovedEvent', Optional[str]], None], Callable[['DomStorageItemRemovedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for domStorageItemRemoved events.
+        Register or unregister a callback for domStorageItemRemoved events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOMStorage.domStorageItemRemoved", callback)
+        if self._mode == 'register':
+            self._registry.register("DOMStorage.domStorageItemRemoved", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOMStorage.domStorageItemRemoved", callback)
 
     def domStorageItemUpdated(
         self,
-        callback: Callable[['DomStorageItemUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['DomStorageItemUpdatedEvent', Optional[str]], None], Callable[['DomStorageItemUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for domStorageItemUpdated events.
+        Register or unregister a callback for domStorageItemUpdated events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOMStorage.domStorageItemUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("DOMStorage.domStorageItemUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOMStorage.domStorageItemUpdated", callback)
 
     def domStorageItemsCleared(
         self,
-        callback: Callable[['DomStorageItemsClearedEvent', Optional[str]], None],
+        callback: Union[Callable[['DomStorageItemsClearedEvent', Optional[str]], None], Callable[['DomStorageItemsClearedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for domStorageItemsCleared events.
+        Register or unregister a callback for domStorageItemsCleared events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOMStorage.domStorageItemsCleared", callback)
+        if self._mode == 'register':
+            self._registry.register("DOMStorage.domStorageItemsCleared", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOMStorage.domStorageItemsCleared", callback)
 

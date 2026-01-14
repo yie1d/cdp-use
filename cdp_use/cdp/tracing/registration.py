@@ -4,7 +4,8 @@
 
 """CDP Tracing Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,29 +16,41 @@ if TYPE_CHECKING:
 class TracingRegistration:
     """Event registration interface for Tracing domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Tracing"
+        self._mode = mode  # 'register' or 'unregister'
 
     def bufferUsage(
         self,
-        callback: Callable[['BufferUsageEvent', Optional[str]], None],
+        callback: Union[Callable[['BufferUsageEvent', Optional[str]], None], Callable[['BufferUsageEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for bufferUsage events.
+        Register or unregister a callback for bufferUsage events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Tracing.bufferUsage", callback)
+        if self._mode == 'register':
+            self._registry.register("Tracing.bufferUsage", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Tracing.bufferUsage", callback)
 
     def dataCollected(
         self,
-        callback: Callable[['DataCollectedEvent', Optional[str]], None],
+        callback: Union[Callable[['DataCollectedEvent', Optional[str]], None], Callable[['DataCollectedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for dataCollected events.
+        Register or unregister a callback for dataCollected events.
         
         Contains a bucket of collected trace events. When tracing is stopped collected events will be
 sent as a sequence of dataCollected events followed by tracingComplete event.
@@ -45,15 +58,25 @@ sent as a sequence of dataCollected events followed by tracingComplete event.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Tracing.dataCollected", callback)
+        if self._mode == 'register':
+            self._registry.register("Tracing.dataCollected", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Tracing.dataCollected", callback)
 
     def tracingComplete(
         self,
-        callback: Callable[['TracingCompleteEvent', Optional[str]], None],
+        callback: Union[Callable[['TracingCompleteEvent', Optional[str]], None], Callable[['TracingCompleteEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for tracingComplete events.
+        Register or unregister a callback for tracingComplete events.
         
         Signals that tracing is stopped and there is no trace buffers pending flush, all data were
 delivered via dataCollected events.
@@ -61,6 +84,15 @@ delivered via dataCollected events.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Tracing.tracingComplete", callback)
+        if self._mode == 'register':
+            self._registry.register("Tracing.tracingComplete", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Tracing.tracingComplete", callback)
 

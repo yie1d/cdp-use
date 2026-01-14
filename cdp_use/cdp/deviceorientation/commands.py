@@ -4,7 +4,7 @@
 
 """CDP DeviceOrientation Domain Commands"""
 
-from typing_extensions import TypedDict
+from typing import TypedDict
 
 class SetDeviceOrientationOverrideParameters(TypedDict):
     alpha: "float"

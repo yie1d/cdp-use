@@ -4,7 +4,8 @@
 
 """CDP Preload Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -22,95 +23,156 @@ if TYPE_CHECKING:
 class PreloadRegistration:
     """Event registration interface for Preload domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Preload"
+        self._mode = mode  # 'register' or 'unregister'
 
     def ruleSetUpdated(
         self,
-        callback: Callable[['RuleSetUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['RuleSetUpdatedEvent', Optional[str]], None], Callable[['RuleSetUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for ruleSetUpdated events.
+        Register or unregister a callback for ruleSetUpdated events.
         
         Upsert. Currently, it is only emitted when a rule set added.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Preload.ruleSetUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("Preload.ruleSetUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Preload.ruleSetUpdated", callback)
 
     def ruleSetRemoved(
         self,
-        callback: Callable[['RuleSetRemovedEvent', Optional[str]], None],
+        callback: Union[Callable[['RuleSetRemovedEvent', Optional[str]], None], Callable[['RuleSetRemovedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for ruleSetRemoved events.
+        Register or unregister a callback for ruleSetRemoved events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Preload.ruleSetRemoved", callback)
+        if self._mode == 'register':
+            self._registry.register("Preload.ruleSetRemoved", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Preload.ruleSetRemoved", callback)
 
     def preloadEnabledStateUpdated(
         self,
-        callback: Callable[['PreloadEnabledStateUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['PreloadEnabledStateUpdatedEvent', Optional[str]], None], Callable[['PreloadEnabledStateUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for preloadEnabledStateUpdated events.
+        Register or unregister a callback for preloadEnabledStateUpdated events.
         
         Fired when a preload enabled state is updated.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Preload.preloadEnabledStateUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("Preload.preloadEnabledStateUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Preload.preloadEnabledStateUpdated", callback)
 
     def prefetchStatusUpdated(
         self,
-        callback: Callable[['PrefetchStatusUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['PrefetchStatusUpdatedEvent', Optional[str]], None], Callable[['PrefetchStatusUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for prefetchStatusUpdated events.
+        Register or unregister a callback for prefetchStatusUpdated events.
         
         Fired when a prefetch attempt is updated.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Preload.prefetchStatusUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("Preload.prefetchStatusUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Preload.prefetchStatusUpdated", callback)
 
     def prerenderStatusUpdated(
         self,
-        callback: Callable[['PrerenderStatusUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['PrerenderStatusUpdatedEvent', Optional[str]], None], Callable[['PrerenderStatusUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for prerenderStatusUpdated events.
+        Register or unregister a callback for prerenderStatusUpdated events.
         
         Fired when a prerender attempt is updated.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Preload.prerenderStatusUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("Preload.prerenderStatusUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Preload.prerenderStatusUpdated", callback)
 
     def preloadingAttemptSourcesUpdated(
         self,
-        callback: Callable[['PreloadingAttemptSourcesUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['PreloadingAttemptSourcesUpdatedEvent', Optional[str]], None], Callable[['PreloadingAttemptSourcesUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for preloadingAttemptSourcesUpdated events.
+        Register or unregister a callback for preloadingAttemptSourcesUpdated events.
         
         Send a list of sources for all preloading attempts in a document.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Preload.preloadingAttemptSourcesUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("Preload.preloadingAttemptSourcesUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Preload.preloadingAttemptSourcesUpdated", callback)
 

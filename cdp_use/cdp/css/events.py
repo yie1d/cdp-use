@@ -4,15 +4,15 @@
 
 """CDP CSS Domain Events"""
 
-from typing_extensions import TypedDict
+from typing import TypedDict
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..dom.types import NodeId
+    from ..dom.types import StyleSheetId
     from .types import CSSStyleSheetHeader
     from .types import FontFace
-    from .types import StyleSheetId
 
 """Fires whenever a web font is updated.  A non-empty font parameter indicates a successfully loaded
 web font."""

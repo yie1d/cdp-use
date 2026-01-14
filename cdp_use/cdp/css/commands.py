@@ -4,19 +4,19 @@
 
 """CDP CSS Domain Commands"""
 
-from typing import List
-from typing_extensions import NotRequired, TypedDict
+from typing import Any, Dict, List, NotRequired, TypedDict
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..dom.types import NodeId
     from ..dom.types import PseudoType
+    from ..dom.types import StyleSheetId
     from ..page.types import FrameId
     from .types import CSSAnimationStyle
+    from .types import CSSAtRule
     from .types import CSSComputedStyleProperty
     from .types import CSSContainerQuery
-    from .types import CSSFontPaletteValuesRule
     from .types import CSSFunctionRule
     from .types import CSSKeyframesRule
     from .types import CSSLayerData
@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from .types import CSSScope
     from .types import CSSStyle
     from .types import CSSSupports
+    from .types import ComputedStyleExtraFields
     from .types import InheritedAnimatedStyleEntry
     from .types import InheritedPseudoElementMatches
     from .types import InheritedStyleEntry
@@ -39,7 +40,6 @@ if TYPE_CHECKING:
     from .types import SelectorList
     from .types import SourceRange
     from .types import StyleDeclarationEdit
-    from .types import StyleSheetId
     from .types import Value
 
 class AddRuleParameters(TypedDict):
@@ -134,13 +134,15 @@ class GetComputedStyleForNodeParameters(TypedDict):
 class GetComputedStyleForNodeReturns(TypedDict):
     computedStyle: "List[CSSComputedStyleProperty]"
     """Computed style for the specified DOM node."""
+    extraFields: "ComputedStyleExtraFields"
+    """A list of non-standard \"extra fields\" which blink stores alongside each
+computed style."""
 
 
 
 class ResolveValuesParameters(TypedDict):
     values: "List[str]"
-    """Substitution functions (var()/env()/attr()) and cascade-dependent
-keywords (revert/revert-layer) do not work."""
+    """Cascade-dependent keywords (revert/revert-layer) do not work."""
     nodeId: "NodeId"
     """Id of the node in whose context the expression is evaluated"""
     propertyName: "NotRequired[str]"
@@ -222,12 +224,17 @@ will not be set if there is no active position-try fallback."""
     """A list of CSS at-property rules matching this node."""
     cssPropertyRegistrations: "List[CSSPropertyRegistration]"
     """A list of CSS property registrations matching this node."""
-    cssFontPaletteValuesRule: "CSSFontPaletteValuesRule"
-    """A font-palette-values rule matching this node."""
+    cssAtRules: "List[CSSAtRule]"
+    """A list of simple @rules matching this node or its pseudo-elements."""
     parentLayoutNodeId: "NodeId"
     """Id of the first parent element that does not have display: contents."""
     cssFunctionRules: "List[CSSFunctionRule]"
     """A list of CSS at-function rules referenced by styles of this node."""
+
+
+
+class GetEnvironmentVariablesReturns(TypedDict):
+    environmentVariables: "Dict[str, Any]"
 
 
 

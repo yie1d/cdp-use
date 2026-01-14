@@ -4,7 +4,8 @@
 
 """CDP Network Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -12,6 +13,8 @@ if TYPE_CHECKING:
     from ..registry import EventRegistry
     from .events import (
     DataReceivedEvent,
+    DeviceBoundSessionEventOccurredEvent,
+    DeviceBoundSessionsAddedEvent,
     DirectTCPSocketAbortedEvent,
     DirectTCPSocketChunkReceivedEvent,
     DirectTCPSocketChunkSentEvent,
@@ -23,6 +26,8 @@ if TYPE_CHECKING:
     DirectUDPSocketChunkSentEvent,
     DirectUDPSocketClosedEvent,
     DirectUDPSocketCreatedEvent,
+    DirectUDPSocketJoinedMulticastGroupEvent,
+    DirectUDPSocketLeftMulticastGroupEvent,
     DirectUDPSocketOpenedEvent,
     EventSourceMessageReceivedEvent,
     LoadingFailedEvent,
@@ -40,10 +45,6 @@ if TYPE_CHECKING:
     ResponseReceivedEvent,
     ResponseReceivedExtraInfoEvent,
     SignedExchangeReceivedEvent,
-    SubresourceWebBundleInnerResponseErrorEvent,
-    SubresourceWebBundleInnerResponseParsedEvent,
-    SubresourceWebBundleMetadataErrorEvent,
-    SubresourceWebBundleMetadataReceivedEvent,
     TrustTokenOperationDoneEvent,
     WebSocketClosedEvent,
     WebSocketCreatedEvent,
@@ -60,76 +61,118 @@ if TYPE_CHECKING:
 class NetworkRegistration:
     """Event registration interface for Network domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Network"
+        self._mode = mode  # 'register' or 'unregister'
 
     def dataReceived(
         self,
-        callback: Callable[['DataReceivedEvent', Optional[str]], None],
+        callback: Union[Callable[['DataReceivedEvent', Optional[str]], None], Callable[['DataReceivedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for dataReceived events.
+        Register or unregister a callback for dataReceived events.
         
         Fired when data chunk was received over the network.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.dataReceived", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.dataReceived", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.dataReceived", callback)
 
     def eventSourceMessageReceived(
         self,
-        callback: Callable[['EventSourceMessageReceivedEvent', Optional[str]], None],
+        callback: Union[Callable[['EventSourceMessageReceivedEvent', Optional[str]], None], Callable[['EventSourceMessageReceivedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for eventSourceMessageReceived events.
+        Register or unregister a callback for eventSourceMessageReceived events.
         
         Fired when EventSource message is received.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.eventSourceMessageReceived", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.eventSourceMessageReceived", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.eventSourceMessageReceived", callback)
 
     def loadingFailed(
         self,
-        callback: Callable[['LoadingFailedEvent', Optional[str]], None],
+        callback: Union[Callable[['LoadingFailedEvent', Optional[str]], None], Callable[['LoadingFailedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for loadingFailed events.
+        Register or unregister a callback for loadingFailed events.
         
         Fired when HTTP request has failed to load.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.loadingFailed", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.loadingFailed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.loadingFailed", callback)
 
     def loadingFinished(
         self,
-        callback: Callable[['LoadingFinishedEvent', Optional[str]], None],
+        callback: Union[Callable[['LoadingFinishedEvent', Optional[str]], None], Callable[['LoadingFinishedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for loadingFinished events.
+        Register or unregister a callback for loadingFinished events.
         
         Fired when HTTP request has finished loading.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.loadingFinished", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.loadingFinished", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.loadingFinished", callback)
 
     def requestIntercepted(
         self,
-        callback: Callable[['RequestInterceptedEvent', Optional[str]], None],
+        callback: Union[Callable[['RequestInterceptedEvent', Optional[str]], None], Callable[['RequestInterceptedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for requestIntercepted events.
+        Register or unregister a callback for requestIntercepted events.
         
         Details of an intercepted HTTP request, which must be either allowed, blocked, modified or
 mocked.
@@ -138,420 +181,746 @@ Deprecated, use Fetch.requestPaused instead.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.requestIntercepted", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.requestIntercepted", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.requestIntercepted", callback)
 
     def requestServedFromCache(
         self,
-        callback: Callable[['RequestServedFromCacheEvent', Optional[str]], None],
+        callback: Union[Callable[['RequestServedFromCacheEvent', Optional[str]], None], Callable[['RequestServedFromCacheEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for requestServedFromCache events.
+        Register or unregister a callback for requestServedFromCache events.
         
         Fired if request ended up loading from cache.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.requestServedFromCache", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.requestServedFromCache", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.requestServedFromCache", callback)
 
     def requestWillBeSent(
         self,
-        callback: Callable[['RequestWillBeSentEvent', Optional[str]], None],
+        callback: Union[Callable[['RequestWillBeSentEvent', Optional[str]], None], Callable[['RequestWillBeSentEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for requestWillBeSent events.
+        Register or unregister a callback for requestWillBeSent events.
         
         Fired when page is about to send HTTP request.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.requestWillBeSent", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.requestWillBeSent", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.requestWillBeSent", callback)
 
     def resourceChangedPriority(
         self,
-        callback: Callable[['ResourceChangedPriorityEvent', Optional[str]], None],
+        callback: Union[Callable[['ResourceChangedPriorityEvent', Optional[str]], None], Callable[['ResourceChangedPriorityEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for resourceChangedPriority events.
+        Register or unregister a callback for resourceChangedPriority events.
         
         Fired when resource loading priority is changed
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.resourceChangedPriority", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.resourceChangedPriority", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.resourceChangedPriority", callback)
 
     def signedExchangeReceived(
         self,
-        callback: Callable[['SignedExchangeReceivedEvent', Optional[str]], None],
+        callback: Union[Callable[['SignedExchangeReceivedEvent', Optional[str]], None], Callable[['SignedExchangeReceivedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for signedExchangeReceived events.
+        Register or unregister a callback for signedExchangeReceived events.
         
         Fired when a signed exchange was received over the network
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.signedExchangeReceived", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.signedExchangeReceived", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.signedExchangeReceived", callback)
 
     def responseReceived(
         self,
-        callback: Callable[['ResponseReceivedEvent', Optional[str]], None],
+        callback: Union[Callable[['ResponseReceivedEvent', Optional[str]], None], Callable[['ResponseReceivedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for responseReceived events.
+        Register or unregister a callback for responseReceived events.
         
         Fired when HTTP response is available.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.responseReceived", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.responseReceived", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.responseReceived", callback)
 
     def webSocketClosed(
         self,
-        callback: Callable[['WebSocketClosedEvent', Optional[str]], None],
+        callback: Union[Callable[['WebSocketClosedEvent', Optional[str]], None], Callable[['WebSocketClosedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for webSocketClosed events.
+        Register or unregister a callback for webSocketClosed events.
         
         Fired when WebSocket is closed.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.webSocketClosed", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.webSocketClosed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.webSocketClosed", callback)
 
     def webSocketCreated(
         self,
-        callback: Callable[['WebSocketCreatedEvent', Optional[str]], None],
+        callback: Union[Callable[['WebSocketCreatedEvent', Optional[str]], None], Callable[['WebSocketCreatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for webSocketCreated events.
+        Register or unregister a callback for webSocketCreated events.
         
         Fired upon WebSocket creation.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.webSocketCreated", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.webSocketCreated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.webSocketCreated", callback)
 
     def webSocketFrameError(
         self,
-        callback: Callable[['WebSocketFrameErrorEvent', Optional[str]], None],
+        callback: Union[Callable[['WebSocketFrameErrorEvent', Optional[str]], None], Callable[['WebSocketFrameErrorEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for webSocketFrameError events.
+        Register or unregister a callback for webSocketFrameError events.
         
         Fired when WebSocket message error occurs.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.webSocketFrameError", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.webSocketFrameError", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.webSocketFrameError", callback)
 
     def webSocketFrameReceived(
         self,
-        callback: Callable[['WebSocketFrameReceivedEvent', Optional[str]], None],
+        callback: Union[Callable[['WebSocketFrameReceivedEvent', Optional[str]], None], Callable[['WebSocketFrameReceivedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for webSocketFrameReceived events.
+        Register or unregister a callback for webSocketFrameReceived events.
         
         Fired when WebSocket message is received.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.webSocketFrameReceived", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.webSocketFrameReceived", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.webSocketFrameReceived", callback)
 
     def webSocketFrameSent(
         self,
-        callback: Callable[['WebSocketFrameSentEvent', Optional[str]], None],
+        callback: Union[Callable[['WebSocketFrameSentEvent', Optional[str]], None], Callable[['WebSocketFrameSentEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for webSocketFrameSent events.
+        Register or unregister a callback for webSocketFrameSent events.
         
         Fired when WebSocket message is sent.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.webSocketFrameSent", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.webSocketFrameSent", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.webSocketFrameSent", callback)
 
     def webSocketHandshakeResponseReceived(
         self,
-        callback: Callable[['WebSocketHandshakeResponseReceivedEvent', Optional[str]], None],
+        callback: Union[Callable[['WebSocketHandshakeResponseReceivedEvent', Optional[str]], None], Callable[['WebSocketHandshakeResponseReceivedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for webSocketHandshakeResponseReceived events.
+        Register or unregister a callback for webSocketHandshakeResponseReceived events.
         
         Fired when WebSocket handshake response becomes available.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.webSocketHandshakeResponseReceived", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.webSocketHandshakeResponseReceived", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.webSocketHandshakeResponseReceived", callback)
 
     def webSocketWillSendHandshakeRequest(
         self,
-        callback: Callable[['WebSocketWillSendHandshakeRequestEvent', Optional[str]], None],
+        callback: Union[Callable[['WebSocketWillSendHandshakeRequestEvent', Optional[str]], None], Callable[['WebSocketWillSendHandshakeRequestEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for webSocketWillSendHandshakeRequest events.
+        Register or unregister a callback for webSocketWillSendHandshakeRequest events.
         
         Fired when WebSocket is about to initiate handshake.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.webSocketWillSendHandshakeRequest", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.webSocketWillSendHandshakeRequest", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.webSocketWillSendHandshakeRequest", callback)
 
     def webTransportCreated(
         self,
-        callback: Callable[['WebTransportCreatedEvent', Optional[str]], None],
+        callback: Union[Callable[['WebTransportCreatedEvent', Optional[str]], None], Callable[['WebTransportCreatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for webTransportCreated events.
+        Register or unregister a callback for webTransportCreated events.
         
         Fired upon WebTransport creation.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.webTransportCreated", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.webTransportCreated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.webTransportCreated", callback)
 
     def webTransportConnectionEstablished(
         self,
-        callback: Callable[['WebTransportConnectionEstablishedEvent', Optional[str]], None],
+        callback: Union[Callable[['WebTransportConnectionEstablishedEvent', Optional[str]], None], Callable[['WebTransportConnectionEstablishedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for webTransportConnectionEstablished events.
+        Register or unregister a callback for webTransportConnectionEstablished events.
         
         Fired when WebTransport handshake is finished.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.webTransportConnectionEstablished", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.webTransportConnectionEstablished", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.webTransportConnectionEstablished", callback)
 
     def webTransportClosed(
         self,
-        callback: Callable[['WebTransportClosedEvent', Optional[str]], None],
+        callback: Union[Callable[['WebTransportClosedEvent', Optional[str]], None], Callable[['WebTransportClosedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for webTransportClosed events.
+        Register or unregister a callback for webTransportClosed events.
         
         Fired when WebTransport is disposed.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.webTransportClosed", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.webTransportClosed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.webTransportClosed", callback)
 
     def directTCPSocketCreated(
         self,
-        callback: Callable[['DirectTCPSocketCreatedEvent', Optional[str]], None],
+        callback: Union[Callable[['DirectTCPSocketCreatedEvent', Optional[str]], None], Callable[['DirectTCPSocketCreatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for directTCPSocketCreated events.
+        Register or unregister a callback for directTCPSocketCreated events.
         
         Fired upon direct_socket.TCPSocket creation.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.directTCPSocketCreated", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.directTCPSocketCreated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.directTCPSocketCreated", callback)
 
     def directTCPSocketOpened(
         self,
-        callback: Callable[['DirectTCPSocketOpenedEvent', Optional[str]], None],
+        callback: Union[Callable[['DirectTCPSocketOpenedEvent', Optional[str]], None], Callable[['DirectTCPSocketOpenedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for directTCPSocketOpened events.
+        Register or unregister a callback for directTCPSocketOpened events.
         
         Fired when direct_socket.TCPSocket connection is opened.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.directTCPSocketOpened", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.directTCPSocketOpened", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.directTCPSocketOpened", callback)
 
     def directTCPSocketAborted(
         self,
-        callback: Callable[['DirectTCPSocketAbortedEvent', Optional[str]], None],
+        callback: Union[Callable[['DirectTCPSocketAbortedEvent', Optional[str]], None], Callable[['DirectTCPSocketAbortedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for directTCPSocketAborted events.
+        Register or unregister a callback for directTCPSocketAborted events.
         
         Fired when direct_socket.TCPSocket is aborted.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.directTCPSocketAborted", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.directTCPSocketAborted", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.directTCPSocketAborted", callback)
 
     def directTCPSocketClosed(
         self,
-        callback: Callable[['DirectTCPSocketClosedEvent', Optional[str]], None],
+        callback: Union[Callable[['DirectTCPSocketClosedEvent', Optional[str]], None], Callable[['DirectTCPSocketClosedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for directTCPSocketClosed events.
+        Register or unregister a callback for directTCPSocketClosed events.
         
         Fired when direct_socket.TCPSocket is closed.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.directTCPSocketClosed", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.directTCPSocketClosed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.directTCPSocketClosed", callback)
 
     def directTCPSocketChunkSent(
         self,
-        callback: Callable[['DirectTCPSocketChunkSentEvent', Optional[str]], None],
+        callback: Union[Callable[['DirectTCPSocketChunkSentEvent', Optional[str]], None], Callable[['DirectTCPSocketChunkSentEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for directTCPSocketChunkSent events.
+        Register or unregister a callback for directTCPSocketChunkSent events.
         
         Fired when data is sent to tcp direct socket stream.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.directTCPSocketChunkSent", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.directTCPSocketChunkSent", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.directTCPSocketChunkSent", callback)
 
     def directTCPSocketChunkReceived(
         self,
-        callback: Callable[['DirectTCPSocketChunkReceivedEvent', Optional[str]], None],
+        callback: Union[Callable[['DirectTCPSocketChunkReceivedEvent', Optional[str]], None], Callable[['DirectTCPSocketChunkReceivedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for directTCPSocketChunkReceived events.
+        Register or unregister a callback for directTCPSocketChunkReceived events.
         
         Fired when data is received from tcp direct socket stream.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.directTCPSocketChunkReceived", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.directTCPSocketChunkReceived", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.directTCPSocketChunkReceived", callback)
+
+    def directUDPSocketJoinedMulticastGroup(
+        self,
+        callback: Union[Callable[['DirectUDPSocketJoinedMulticastGroupEvent', Optional[str]], None], Callable[['DirectUDPSocketJoinedMulticastGroupEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
+    ) -> None:
+        """
+        Register or unregister a callback for directUDPSocketJoinedMulticastGroup events.
+        
+        Args:
+            callback: Function to call when event occurs.
+                     Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
+        """
+        if self._mode == 'register':
+            self._registry.register("Network.directUDPSocketJoinedMulticastGroup", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.directUDPSocketJoinedMulticastGroup", callback)
+
+    def directUDPSocketLeftMulticastGroup(
+        self,
+        callback: Union[Callable[['DirectUDPSocketLeftMulticastGroupEvent', Optional[str]], None], Callable[['DirectUDPSocketLeftMulticastGroupEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
+    ) -> None:
+        """
+        Register or unregister a callback for directUDPSocketLeftMulticastGroup events.
+        
+        Args:
+            callback: Function to call when event occurs.
+                     Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
+        """
+        if self._mode == 'register':
+            self._registry.register("Network.directUDPSocketLeftMulticastGroup", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.directUDPSocketLeftMulticastGroup", callback)
 
     def directUDPSocketCreated(
         self,
-        callback: Callable[['DirectUDPSocketCreatedEvent', Optional[str]], None],
+        callback: Union[Callable[['DirectUDPSocketCreatedEvent', Optional[str]], None], Callable[['DirectUDPSocketCreatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for directUDPSocketCreated events.
+        Register or unregister a callback for directUDPSocketCreated events.
         
         Fired upon direct_socket.UDPSocket creation.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.directUDPSocketCreated", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.directUDPSocketCreated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.directUDPSocketCreated", callback)
 
     def directUDPSocketOpened(
         self,
-        callback: Callable[['DirectUDPSocketOpenedEvent', Optional[str]], None],
+        callback: Union[Callable[['DirectUDPSocketOpenedEvent', Optional[str]], None], Callable[['DirectUDPSocketOpenedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for directUDPSocketOpened events.
+        Register or unregister a callback for directUDPSocketOpened events.
         
         Fired when direct_socket.UDPSocket connection is opened.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.directUDPSocketOpened", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.directUDPSocketOpened", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.directUDPSocketOpened", callback)
 
     def directUDPSocketAborted(
         self,
-        callback: Callable[['DirectUDPSocketAbortedEvent', Optional[str]], None],
+        callback: Union[Callable[['DirectUDPSocketAbortedEvent', Optional[str]], None], Callable[['DirectUDPSocketAbortedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for directUDPSocketAborted events.
+        Register or unregister a callback for directUDPSocketAborted events.
         
         Fired when direct_socket.UDPSocket is aborted.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.directUDPSocketAborted", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.directUDPSocketAborted", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.directUDPSocketAborted", callback)
 
     def directUDPSocketClosed(
         self,
-        callback: Callable[['DirectUDPSocketClosedEvent', Optional[str]], None],
+        callback: Union[Callable[['DirectUDPSocketClosedEvent', Optional[str]], None], Callable[['DirectUDPSocketClosedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for directUDPSocketClosed events.
+        Register or unregister a callback for directUDPSocketClosed events.
         
         Fired when direct_socket.UDPSocket is closed.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.directUDPSocketClosed", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.directUDPSocketClosed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.directUDPSocketClosed", callback)
 
     def directUDPSocketChunkSent(
         self,
-        callback: Callable[['DirectUDPSocketChunkSentEvent', Optional[str]], None],
+        callback: Union[Callable[['DirectUDPSocketChunkSentEvent', Optional[str]], None], Callable[['DirectUDPSocketChunkSentEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for directUDPSocketChunkSent events.
+        Register or unregister a callback for directUDPSocketChunkSent events.
         
         Fired when message is sent to udp direct socket stream.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.directUDPSocketChunkSent", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.directUDPSocketChunkSent", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.directUDPSocketChunkSent", callback)
 
     def directUDPSocketChunkReceived(
         self,
-        callback: Callable[['DirectUDPSocketChunkReceivedEvent', Optional[str]], None],
+        callback: Union[Callable[['DirectUDPSocketChunkReceivedEvent', Optional[str]], None], Callable[['DirectUDPSocketChunkReceivedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for directUDPSocketChunkReceived events.
+        Register or unregister a callback for directUDPSocketChunkReceived events.
         
         Fired when message is received from udp direct socket stream.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.directUDPSocketChunkReceived", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.directUDPSocketChunkReceived", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.directUDPSocketChunkReceived", callback)
 
     def requestWillBeSentExtraInfo(
         self,
-        callback: Callable[['RequestWillBeSentExtraInfoEvent', Optional[str]], None],
+        callback: Union[Callable[['RequestWillBeSentExtraInfoEvent', Optional[str]], None], Callable[['RequestWillBeSentExtraInfoEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for requestWillBeSentExtraInfo events.
+        Register or unregister a callback for requestWillBeSentExtraInfo events.
         
         Fired when additional information about a requestWillBeSent event is available from the
 network stack. Not every requestWillBeSent event will have an additional
@@ -561,15 +930,25 @@ or requestWillBeSentExtraInfo will be fired first for the same request.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.requestWillBeSentExtraInfo", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.requestWillBeSentExtraInfo", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.requestWillBeSentExtraInfo", callback)
 
     def responseReceivedExtraInfo(
         self,
-        callback: Callable[['ResponseReceivedExtraInfoEvent', Optional[str]], None],
+        callback: Union[Callable[['ResponseReceivedExtraInfoEvent', Optional[str]], None], Callable[['ResponseReceivedExtraInfoEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for responseReceivedExtraInfo events.
+        Register or unregister a callback for responseReceivedExtraInfo events.
         
         Fired when additional information about a responseReceived event is available from the network
 stack. Not every responseReceived event will have an additional responseReceivedExtraInfo for
@@ -578,15 +957,25 @@ it, and responseReceivedExtraInfo may be fired before or after responseReceived.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.responseReceivedExtraInfo", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.responseReceivedExtraInfo", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.responseReceivedExtraInfo", callback)
 
     def responseReceivedEarlyHints(
         self,
-        callback: Callable[['ResponseReceivedEarlyHintsEvent', Optional[str]], None],
+        callback: Union[Callable[['ResponseReceivedEarlyHintsEvent', Optional[str]], None], Callable[['ResponseReceivedEarlyHintsEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for responseReceivedEarlyHints events.
+        Register or unregister a callback for responseReceivedEarlyHints events.
         
         Fired when 103 Early Hints headers is received in addition to the common response.
 Not every responseReceived event will have an responseReceivedEarlyHints fired.
@@ -595,15 +984,25 @@ Only one responseReceivedEarlyHints may be fired for eached responseReceived eve
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.responseReceivedEarlyHints", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.responseReceivedEarlyHints", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.responseReceivedEarlyHints", callback)
 
     def trustTokenOperationDone(
         self,
-        callback: Callable[['TrustTokenOperationDoneEvent', Optional[str]], None],
+        callback: Union[Callable[['TrustTokenOperationDoneEvent', Optional[str]], None], Callable[['TrustTokenOperationDoneEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for trustTokenOperationDone events.
+        Register or unregister a callback for trustTokenOperationDone events.
         
         Fired exactly once for each Trust Token operation. Depending on
 the type of the operation and whether the operation succeeded or
@@ -613,92 +1012,50 @@ or after the response was received.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.trustTokenOperationDone", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.trustTokenOperationDone", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.trustTokenOperationDone", callback)
 
     def policyUpdated(
         self,
-        callback: Callable[['PolicyUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['PolicyUpdatedEvent', Optional[str]], None], Callable[['PolicyUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for policyUpdated events.
+        Register or unregister a callback for policyUpdated events.
         
         Fired once security policy has been updated.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
-        """
-        self._registry.register("Network.policyUpdated", callback)
-
-    def subresourceWebBundleMetadataReceived(
-        self,
-        callback: Callable[['SubresourceWebBundleMetadataReceivedEvent', Optional[str]], None],
-    ) -> None:
-        """
-        Register a callback for subresourceWebBundleMetadataReceived events.
+            once: If True, callback will be removed after first execution (register mode only).
         
-        Fired once when parsing the .wbn file has succeeded.
-The event contains the information about the web bundle contents.
-        
-        Args:
-            callback: Function to call when event occurs.
-                     Receives (event_data, session_id) as parameters.
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.subresourceWebBundleMetadataReceived", callback)
-
-    def subresourceWebBundleMetadataError(
-        self,
-        callback: Callable[['SubresourceWebBundleMetadataErrorEvent', Optional[str]], None],
-    ) -> None:
-        """
-        Register a callback for subresourceWebBundleMetadataError events.
-        
-        Fired once when parsing the .wbn file has failed.
-        
-        Args:
-            callback: Function to call when event occurs.
-                     Receives (event_data, session_id) as parameters.
-        """
-        self._registry.register("Network.subresourceWebBundleMetadataError", callback)
-
-    def subresourceWebBundleInnerResponseParsed(
-        self,
-        callback: Callable[['SubresourceWebBundleInnerResponseParsedEvent', Optional[str]], None],
-    ) -> None:
-        """
-        Register a callback for subresourceWebBundleInnerResponseParsed events.
-        
-        Fired when handling requests for resources within a .wbn file.
-Note: this will only be fired for resources that are requested by the webpage.
-        
-        Args:
-            callback: Function to call when event occurs.
-                     Receives (event_data, session_id) as parameters.
-        """
-        self._registry.register("Network.subresourceWebBundleInnerResponseParsed", callback)
-
-    def subresourceWebBundleInnerResponseError(
-        self,
-        callback: Callable[['SubresourceWebBundleInnerResponseErrorEvent', Optional[str]], None],
-    ) -> None:
-        """
-        Register a callback for subresourceWebBundleInnerResponseError events.
-        
-        Fired when request for resources within a .wbn file failed.
-        
-        Args:
-            callback: Function to call when event occurs.
-                     Receives (event_data, session_id) as parameters.
-        """
-        self._registry.register("Network.subresourceWebBundleInnerResponseError", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.policyUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.policyUpdated", callback)
 
     def reportingApiReportAdded(
         self,
-        callback: Callable[['ReportingApiReportAddedEvent', Optional[str]], None],
+        callback: Union[Callable[['ReportingApiReportAddedEvent', Optional[str]], None], Callable[['ReportingApiReportAddedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for reportingApiReportAdded events.
+        Register or unregister a callback for reportingApiReportAdded events.
         
         Is sent whenever a new report is added.
 And after 'enableReportingApi' for all existing reports.
@@ -706,32 +1063,111 @@ And after 'enableReportingApi' for all existing reports.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.reportingApiReportAdded", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.reportingApiReportAdded", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.reportingApiReportAdded", callback)
 
     def reportingApiReportUpdated(
         self,
-        callback: Callable[['ReportingApiReportUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['ReportingApiReportUpdatedEvent', Optional[str]], None], Callable[['ReportingApiReportUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for reportingApiReportUpdated events.
+        Register or unregister a callback for reportingApiReportUpdated events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.reportingApiReportUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.reportingApiReportUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.reportingApiReportUpdated", callback)
 
     def reportingApiEndpointsChangedForOrigin(
         self,
-        callback: Callable[['ReportingApiEndpointsChangedForOriginEvent', Optional[str]], None],
+        callback: Union[Callable[['ReportingApiEndpointsChangedForOriginEvent', Optional[str]], None], Callable[['ReportingApiEndpointsChangedForOriginEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for reportingApiEndpointsChangedForOrigin events.
+        Register or unregister a callback for reportingApiEndpointsChangedForOrigin events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Network.reportingApiEndpointsChangedForOrigin", callback)
+        if self._mode == 'register':
+            self._registry.register("Network.reportingApiEndpointsChangedForOrigin", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.reportingApiEndpointsChangedForOrigin", callback)
+
+    def deviceBoundSessionsAdded(
+        self,
+        callback: Union[Callable[['DeviceBoundSessionsAddedEvent', Optional[str]], None], Callable[['DeviceBoundSessionsAddedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
+    ) -> None:
+        """
+        Register or unregister a callback for deviceBoundSessionsAdded events.
+        
+        Triggered when the initial set of device bound sessions is added.
+        
+        Args:
+            callback: Function to call when event occurs.
+                     Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
+        """
+        if self._mode == 'register':
+            self._registry.register("Network.deviceBoundSessionsAdded", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.deviceBoundSessionsAdded", callback)
+
+    def deviceBoundSessionEventOccurred(
+        self,
+        callback: Union[Callable[['DeviceBoundSessionEventOccurredEvent', Optional[str]], None], Callable[['DeviceBoundSessionEventOccurredEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
+    ) -> None:
+        """
+        Register or unregister a callback for deviceBoundSessionEventOccurred events.
+        
+        Triggered when a device bound session event occurs.
+        
+        Args:
+            callback: Function to call when event occurs.
+                     Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
+        """
+        if self._mode == 'register':
+            self._registry.register("Network.deviceBoundSessionEventOccurred", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Network.deviceBoundSessionEventOccurred", callback)
 

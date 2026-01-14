@@ -4,63 +4,120 @@
 
 """CDP Inspector Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..registry import EventRegistry
-    from .events import DetachedEvent, TargetCrashedEvent, TargetReloadedAfterCrashEvent
+    from .events import DetachedEvent, TargetCrashedEvent, TargetReloadedAfterCrashEvent, WorkerScriptLoadedEvent
 
 class InspectorRegistration:
     """Event registration interface for Inspector domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Inspector"
+        self._mode = mode  # 'register' or 'unregister'
 
     def detached(
         self,
-        callback: Callable[['DetachedEvent', Optional[str]], None],
+        callback: Union[Callable[['DetachedEvent', Optional[str]], None], Callable[['DetachedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for detached events.
+        Register or unregister a callback for detached events.
         
         Fired when remote debugging connection is about to be terminated. Contains detach reason.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Inspector.detached", callback)
+        if self._mode == 'register':
+            self._registry.register("Inspector.detached", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Inspector.detached", callback)
 
     def targetCrashed(
         self,
-        callback: Callable[['TargetCrashedEvent', Optional[str]], None],
+        callback: Union[Callable[['TargetCrashedEvent', Optional[str]], None], Callable[['TargetCrashedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for targetCrashed events.
+        Register or unregister a callback for targetCrashed events.
         
         Fired when debugging target has crashed
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Inspector.targetCrashed", callback)
+        if self._mode == 'register':
+            self._registry.register("Inspector.targetCrashed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Inspector.targetCrashed", callback)
 
     def targetReloadedAfterCrash(
         self,
-        callback: Callable[['TargetReloadedAfterCrashEvent', Optional[str]], None],
+        callback: Union[Callable[['TargetReloadedAfterCrashEvent', Optional[str]], None], Callable[['TargetReloadedAfterCrashEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for targetReloadedAfterCrash events.
+        Register or unregister a callback for targetReloadedAfterCrash events.
         
         Fired when debugging target has reloaded after crash
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Inspector.targetReloadedAfterCrash", callback)
+        if self._mode == 'register':
+            self._registry.register("Inspector.targetReloadedAfterCrash", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Inspector.targetReloadedAfterCrash", callback)
+
+    def workerScriptLoaded(
+        self,
+        callback: Union[Callable[['WorkerScriptLoadedEvent', Optional[str]], None], Callable[['WorkerScriptLoadedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
+    ) -> None:
+        """
+        Register or unregister a callback for workerScriptLoaded events.
+        
+        Fired on worker targets when main worker script and any imported scripts have been evaluated.
+        
+        Args:
+            callback: Function to call when event occurs.
+                     Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
+        """
+        if self._mode == 'register':
+            self._registry.register("Inspector.workerScriptLoaded", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Inspector.workerScriptLoaded", callback)
 

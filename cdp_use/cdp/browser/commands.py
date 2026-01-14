@@ -4,8 +4,7 @@
 
 """CDP Browser Domain Commands"""
 
-from typing import List
-from typing_extensions import NotRequired, TypedDict
+from typing import List, NotRequired, TypedDict
 
 from typing import TYPE_CHECKING
 
@@ -27,7 +26,11 @@ class SetPermissionParameters(TypedDict):
     setting: "PermissionSetting"
     """Setting of the permission."""
     origin: "NotRequired[str]"
-    """Origin the permission applies to, all origins if not specified."""
+    """Embedding origin the permission applies to, all origins if not specified."""
+    embeddedOrigin: "NotRequired[str]"
+    """Embedded origin the permission applies to. It is ignored unless the embedding origin is
+present and valid. If the embedding origin is provided but the embedded origin isn't, the
+embedding origin is used as the embedded origin."""
     browserContextId: "NotRequired[BrowserContextID]"
     """Context to override. When omitted, default browser context is used."""
 

@@ -4,7 +4,7 @@
 
 """CDP Performance Domain Types"""
 
-from typing_extensions import TypedDict
+from typing import TypedDict
 
 class Metric(TypedDict):
     """Run-time execution metric."""

@@ -4,9 +4,8 @@
 
 """CDP Input Domain Types"""
 
-from typing import List
-from typing_extensions import Literal
-from typing_extensions import NotRequired, TypedDict
+from typing import List, NotRequired, TypedDict
+from typing import Literal
 
 class TouchPoint(TypedDict):
     x: "float"

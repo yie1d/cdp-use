@@ -4,7 +4,8 @@
 
 """CDP LayerTree Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,33 +16,54 @@ if TYPE_CHECKING:
 class LayerTreeRegistration:
     """Event registration interface for LayerTree domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "LayerTree"
+        self._mode = mode  # 'register' or 'unregister'
 
     def layerPainted(
         self,
-        callback: Callable[['LayerPaintedEvent', Optional[str]], None],
+        callback: Union[Callable[['LayerPaintedEvent', Optional[str]], None], Callable[['LayerPaintedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for layerPainted events.
+        Register or unregister a callback for layerPainted events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("LayerTree.layerPainted", callback)
+        if self._mode == 'register':
+            self._registry.register("LayerTree.layerPainted", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("LayerTree.layerPainted", callback)
 
     def layerTreeDidChange(
         self,
-        callback: Callable[['LayerTreeDidChangeEvent', Optional[str]], None],
+        callback: Union[Callable[['LayerTreeDidChangeEvent', Optional[str]], None], Callable[['LayerTreeDidChangeEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for layerTreeDidChange events.
+        Register or unregister a callback for layerTreeDidChange events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("LayerTree.layerTreeDidChange", callback)
+        if self._mode == 'register':
+            self._registry.register("LayerTree.layerTreeDidChange", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("LayerTree.layerTreeDidChange", callback)
 

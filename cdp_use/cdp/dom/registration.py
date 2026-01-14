@@ -4,13 +4,16 @@
 
 """CDP DOM Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..registry import EventRegistry
     from .events import (
+    AdoptedStyleSheetsModifiedEvent,
+    AffectedByStartingStylesFlagUpdatedEvent,
     AttributeModifiedEvent,
     AttributeRemovedEvent,
     CharacterDataModifiedEvent,
@@ -32,211 +35,393 @@ if TYPE_CHECKING:
 class DOMRegistration:
     """Event registration interface for DOM domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "DOM"
+        self._mode = mode  # 'register' or 'unregister'
 
     def attributeModified(
         self,
-        callback: Callable[['AttributeModifiedEvent', Optional[str]], None],
+        callback: Union[Callable[['AttributeModifiedEvent', Optional[str]], None], Callable[['AttributeModifiedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for attributeModified events.
+        Register or unregister a callback for attributeModified events.
         
         Fired when `Element`'s attribute is modified.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOM.attributeModified", callback)
+        if self._mode == 'register':
+            self._registry.register("DOM.attributeModified", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.attributeModified", callback)
+
+    def adoptedStyleSheetsModified(
+        self,
+        callback: Union[Callable[['AdoptedStyleSheetsModifiedEvent', Optional[str]], None], Callable[['AdoptedStyleSheetsModifiedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
+    ) -> None:
+        """
+        Register or unregister a callback for adoptedStyleSheetsModified events.
+        
+        Fired when `Element`'s adoptedStyleSheets are modified.
+        
+        Args:
+            callback: Function to call when event occurs.
+                     Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
+        """
+        if self._mode == 'register':
+            self._registry.register("DOM.adoptedStyleSheetsModified", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.adoptedStyleSheetsModified", callback)
 
     def attributeRemoved(
         self,
-        callback: Callable[['AttributeRemovedEvent', Optional[str]], None],
+        callback: Union[Callable[['AttributeRemovedEvent', Optional[str]], None], Callable[['AttributeRemovedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for attributeRemoved events.
+        Register or unregister a callback for attributeRemoved events.
         
         Fired when `Element`'s attribute is removed.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOM.attributeRemoved", callback)
+        if self._mode == 'register':
+            self._registry.register("DOM.attributeRemoved", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.attributeRemoved", callback)
 
     def characterDataModified(
         self,
-        callback: Callable[['CharacterDataModifiedEvent', Optional[str]], None],
+        callback: Union[Callable[['CharacterDataModifiedEvent', Optional[str]], None], Callable[['CharacterDataModifiedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for characterDataModified events.
+        Register or unregister a callback for characterDataModified events.
         
         Mirrors `DOMCharacterDataModified` event.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOM.characterDataModified", callback)
+        if self._mode == 'register':
+            self._registry.register("DOM.characterDataModified", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.characterDataModified", callback)
 
     def childNodeCountUpdated(
         self,
-        callback: Callable[['ChildNodeCountUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['ChildNodeCountUpdatedEvent', Optional[str]], None], Callable[['ChildNodeCountUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for childNodeCountUpdated events.
+        Register or unregister a callback for childNodeCountUpdated events.
         
         Fired when `Container`'s child node count has changed.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOM.childNodeCountUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("DOM.childNodeCountUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.childNodeCountUpdated", callback)
 
     def childNodeInserted(
         self,
-        callback: Callable[['ChildNodeInsertedEvent', Optional[str]], None],
+        callback: Union[Callable[['ChildNodeInsertedEvent', Optional[str]], None], Callable[['ChildNodeInsertedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for childNodeInserted events.
+        Register or unregister a callback for childNodeInserted events.
         
         Mirrors `DOMNodeInserted` event.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOM.childNodeInserted", callback)
+        if self._mode == 'register':
+            self._registry.register("DOM.childNodeInserted", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.childNodeInserted", callback)
 
     def childNodeRemoved(
         self,
-        callback: Callable[['ChildNodeRemovedEvent', Optional[str]], None],
+        callback: Union[Callable[['ChildNodeRemovedEvent', Optional[str]], None], Callable[['ChildNodeRemovedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for childNodeRemoved events.
+        Register or unregister a callback for childNodeRemoved events.
         
         Mirrors `DOMNodeRemoved` event.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOM.childNodeRemoved", callback)
+        if self._mode == 'register':
+            self._registry.register("DOM.childNodeRemoved", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.childNodeRemoved", callback)
 
     def distributedNodesUpdated(
         self,
-        callback: Callable[['DistributedNodesUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['DistributedNodesUpdatedEvent', Optional[str]], None], Callable[['DistributedNodesUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for distributedNodesUpdated events.
+        Register or unregister a callback for distributedNodesUpdated events.
         
         Called when distribution is changed.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOM.distributedNodesUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("DOM.distributedNodesUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.distributedNodesUpdated", callback)
 
     def documentUpdated(
         self,
-        callback: Callable[['DocumentUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['DocumentUpdatedEvent', Optional[str]], None], Callable[['DocumentUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for documentUpdated events.
+        Register or unregister a callback for documentUpdated events.
         
         Fired when `Document` has been totally updated. Node ids are no longer valid.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOM.documentUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("DOM.documentUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.documentUpdated", callback)
 
     def inlineStyleInvalidated(
         self,
-        callback: Callable[['InlineStyleInvalidatedEvent', Optional[str]], None],
+        callback: Union[Callable[['InlineStyleInvalidatedEvent', Optional[str]], None], Callable[['InlineStyleInvalidatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for inlineStyleInvalidated events.
+        Register or unregister a callback for inlineStyleInvalidated events.
         
         Fired when `Element`'s inline style is modified via a CSS property modification.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOM.inlineStyleInvalidated", callback)
+        if self._mode == 'register':
+            self._registry.register("DOM.inlineStyleInvalidated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.inlineStyleInvalidated", callback)
 
     def pseudoElementAdded(
         self,
-        callback: Callable[['PseudoElementAddedEvent', Optional[str]], None],
+        callback: Union[Callable[['PseudoElementAddedEvent', Optional[str]], None], Callable[['PseudoElementAddedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for pseudoElementAdded events.
+        Register or unregister a callback for pseudoElementAdded events.
         
         Called when a pseudo element is added to an element.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOM.pseudoElementAdded", callback)
+        if self._mode == 'register':
+            self._registry.register("DOM.pseudoElementAdded", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.pseudoElementAdded", callback)
 
     def topLayerElementsUpdated(
         self,
-        callback: Callable[['TopLayerElementsUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['TopLayerElementsUpdatedEvent', Optional[str]], None], Callable[['TopLayerElementsUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for topLayerElementsUpdated events.
+        Register or unregister a callback for topLayerElementsUpdated events.
         
         Called when top layer elements are changed.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOM.topLayerElementsUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("DOM.topLayerElementsUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.topLayerElementsUpdated", callback)
 
     def scrollableFlagUpdated(
         self,
-        callback: Callable[['ScrollableFlagUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['ScrollableFlagUpdatedEvent', Optional[str]], None], Callable[['ScrollableFlagUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for scrollableFlagUpdated events.
+        Register or unregister a callback for scrollableFlagUpdated events.
         
         Fired when a node's scrollability state changes.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOM.scrollableFlagUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("DOM.scrollableFlagUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.scrollableFlagUpdated", callback)
+
+    def affectedByStartingStylesFlagUpdated(
+        self,
+        callback: Union[Callable[['AffectedByStartingStylesFlagUpdatedEvent', Optional[str]], None], Callable[['AffectedByStartingStylesFlagUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
+    ) -> None:
+        """
+        Register or unregister a callback for affectedByStartingStylesFlagUpdated events.
+        
+        Fired when a node's starting styles changes.
+        
+        Args:
+            callback: Function to call when event occurs.
+                     Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
+        """
+        if self._mode == 'register':
+            self._registry.register("DOM.affectedByStartingStylesFlagUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.affectedByStartingStylesFlagUpdated", callback)
 
     def pseudoElementRemoved(
         self,
-        callback: Callable[['PseudoElementRemovedEvent', Optional[str]], None],
+        callback: Union[Callable[['PseudoElementRemovedEvent', Optional[str]], None], Callable[['PseudoElementRemovedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for pseudoElementRemoved events.
+        Register or unregister a callback for pseudoElementRemoved events.
         
         Called when a pseudo element is removed from an element.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOM.pseudoElementRemoved", callback)
+        if self._mode == 'register':
+            self._registry.register("DOM.pseudoElementRemoved", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.pseudoElementRemoved", callback)
 
     def setChildNodes(
         self,
-        callback: Callable[['SetChildNodesEvent', Optional[str]], None],
+        callback: Union[Callable[['SetChildNodesEvent', Optional[str]], None], Callable[['SetChildNodesEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for setChildNodes events.
+        Register or unregister a callback for setChildNodes events.
         
         Fired when backend wants to provide client with the missing DOM structure. This happens upon
 most of the calls requesting node ids.
@@ -244,36 +429,65 @@ most of the calls requesting node ids.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOM.setChildNodes", callback)
+        if self._mode == 'register':
+            self._registry.register("DOM.setChildNodes", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.setChildNodes", callback)
 
     def shadowRootPopped(
         self,
-        callback: Callable[['ShadowRootPoppedEvent', Optional[str]], None],
+        callback: Union[Callable[['ShadowRootPoppedEvent', Optional[str]], None], Callable[['ShadowRootPoppedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for shadowRootPopped events.
+        Register or unregister a callback for shadowRootPopped events.
         
         Called when shadow root is popped from the element.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOM.shadowRootPopped", callback)
+        if self._mode == 'register':
+            self._registry.register("DOM.shadowRootPopped", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.shadowRootPopped", callback)
 
     def shadowRootPushed(
         self,
-        callback: Callable[['ShadowRootPushedEvent', Optional[str]], None],
+        callback: Union[Callable[['ShadowRootPushedEvent', Optional[str]], None], Callable[['ShadowRootPushedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for shadowRootPushed events.
+        Register or unregister a callback for shadowRootPushed events.
         
         Called when shadow root is pushed into the element.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("DOM.shadowRootPushed", callback)
+        if self._mode == 'register':
+            self._registry.register("DOM.shadowRootPushed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("DOM.shadowRootPushed", callback)
 

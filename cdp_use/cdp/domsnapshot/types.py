@@ -4,8 +4,7 @@
 
 """CDP DOMSnapshot Domain Types"""
 
-from typing import List
-from typing_extensions import NotRequired, TypedDict
+from typing import List, NotRequired, TypedDict
 
 from typing import TYPE_CHECKING
 

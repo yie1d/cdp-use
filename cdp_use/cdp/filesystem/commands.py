@@ -4,7 +4,7 @@
 
 """CDP FileSystem Domain Commands"""
 
-from typing_extensions import TypedDict
+from typing import TypedDict
 
 from typing import TYPE_CHECKING
 

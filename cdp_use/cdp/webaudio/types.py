@@ -4,8 +4,8 @@
 
 """CDP WebAudio Domain Types"""
 
-from typing_extensions import Literal
-from typing_extensions import NotRequired, TypedDict
+from typing import NotRequired, TypedDict
+from typing import Literal
 
 GraphObjectId = str
 """An unique ID for a graph object (AudioContext, AudioNode, AudioParam) in Web Audio API"""

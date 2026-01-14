@@ -4,9 +4,8 @@
 
 """CDP Preload Domain Types"""
 
-from typing import List
-from typing_extensions import Literal
-from typing_extensions import NotRequired, TypedDict
+from typing import List, NotRequired, TypedDict
+from typing import Literal
 
 from typing import TYPE_CHECKING
 
@@ -52,14 +51,17 @@ See also:
 `errorMessage` is null iff `errorType` is null."""
     errorMessage: "NotRequired[str]"
     """TODO(https://crbug.com/1425354): Replace this property with structured error."""
+    tag: "NotRequired[str]"
+    """For more details, see:
+https://github.com/WICG/nav-speculation/blob/main/speculation-rules-tags.md"""
 
 
 
-RuleSetErrorType = Literal["SourceIsNotJsonObject", "InvalidRulesSkipped"]
+RuleSetErrorType = Literal["SourceIsNotJsonObject", "InvalidRulesSkipped", "InvalidRulesetLevelTag"]
 
 
 
-SpeculationAction = Literal["Prefetch", "Prerender"]
+SpeculationAction = Literal["Prefetch", "Prerender", "PrerenderUntilScript"]
 """The type of preloading attempted. It corresponds to
 mojom::SpeculationAction (although PrefetchWithSubresources is omitted as it
 isn't being used by clients)."""
@@ -111,7 +113,7 @@ CDP events for them are emitted separately but they share
 
 
 
-PrerenderFinalStatus = Literal["Activated", "Destroyed", "LowEndDevice", "InvalidSchemeRedirect", "InvalidSchemeNavigation", "NavigationRequestBlockedByCsp", "MojoBinderPolicy", "RendererProcessCrashed", "RendererProcessKilled", "Download", "TriggerDestroyed", "NavigationNotCommitted", "NavigationBadHttpStatus", "ClientCertRequested", "NavigationRequestNetworkError", "CancelAllHostsForTesting", "DidFailLoad", "Stop", "SslCertificateError", "LoginAuthRequested", "UaChangeRequiresReload", "BlockedByClient", "AudioOutputDeviceRequested", "MixedContent", "TriggerBackgrounded", "MemoryLimitExceeded", "DataSaverEnabled", "TriggerUrlHasEffectiveUrl", "ActivatedBeforeStarted", "InactivePageRestriction", "StartFailed", "TimeoutBackgrounded", "CrossSiteRedirectInInitialNavigation", "CrossSiteNavigationInInitialNavigation", "SameSiteCrossOriginRedirectNotOptInInInitialNavigation", "SameSiteCrossOriginNavigationNotOptInInInitialNavigation", "ActivationNavigationParameterMismatch", "ActivatedInBackground", "EmbedderHostDisallowed", "ActivationNavigationDestroyedBeforeSuccess", "TabClosedByUserGesture", "TabClosedWithoutUserGesture", "PrimaryMainFrameRendererProcessCrashed", "PrimaryMainFrameRendererProcessKilled", "ActivationFramePolicyNotCompatible", "PreloadingDisabled", "BatterySaverEnabled", "ActivatedDuringMainFrameNavigation", "PreloadingUnsupportedByWebContents", "CrossSiteRedirectInMainFrameNavigation", "CrossSiteNavigationInMainFrameNavigation", "SameSiteCrossOriginRedirectNotOptInInMainFrameNavigation", "SameSiteCrossOriginNavigationNotOptInInMainFrameNavigation", "MemoryPressureOnTrigger", "MemoryPressureAfterTriggered", "PrerenderingDisabledByDevTools", "SpeculationRuleRemoved", "ActivatedWithAuxiliaryBrowsingContexts", "MaxNumOfRunningEagerPrerendersExceeded", "MaxNumOfRunningNonEagerPrerendersExceeded", "MaxNumOfRunningEmbedderPrerendersExceeded", "PrerenderingUrlHasEffectiveUrl", "RedirectedPrerenderingUrlHasEffectiveUrl", "ActivationUrlHasEffectiveUrl", "JavaScriptInterfaceAdded", "JavaScriptInterfaceRemoved", "AllPrerenderingCanceled", "WindowClosed", "SlowNetwork", "OtherPrerenderedPageActivated", "V8OptimizerDisabled", "PrerenderFailedDuringPrefetch", "BrowsingDataRemoved"]
+PrerenderFinalStatus = Literal["Activated", "Destroyed", "LowEndDevice", "InvalidSchemeRedirect", "InvalidSchemeNavigation", "NavigationRequestBlockedByCsp", "MojoBinderPolicy", "RendererProcessCrashed", "RendererProcessKilled", "Download", "TriggerDestroyed", "NavigationNotCommitted", "NavigationBadHttpStatus", "ClientCertRequested", "NavigationRequestNetworkError", "CancelAllHostsForTesting", "DidFailLoad", "Stop", "SslCertificateError", "LoginAuthRequested", "UaChangeRequiresReload", "BlockedByClient", "AudioOutputDeviceRequested", "MixedContent", "TriggerBackgrounded", "MemoryLimitExceeded", "DataSaverEnabled", "TriggerUrlHasEffectiveUrl", "ActivatedBeforeStarted", "InactivePageRestriction", "StartFailed", "TimeoutBackgrounded", "CrossSiteRedirectInInitialNavigation", "CrossSiteNavigationInInitialNavigation", "SameSiteCrossOriginRedirectNotOptInInInitialNavigation", "SameSiteCrossOriginNavigationNotOptInInInitialNavigation", "ActivationNavigationParameterMismatch", "ActivatedInBackground", "EmbedderHostDisallowed", "ActivationNavigationDestroyedBeforeSuccess", "TabClosedByUserGesture", "TabClosedWithoutUserGesture", "PrimaryMainFrameRendererProcessCrashed", "PrimaryMainFrameRendererProcessKilled", "ActivationFramePolicyNotCompatible", "PreloadingDisabled", "BatterySaverEnabled", "ActivatedDuringMainFrameNavigation", "PreloadingUnsupportedByWebContents", "CrossSiteRedirectInMainFrameNavigation", "CrossSiteNavigationInMainFrameNavigation", "SameSiteCrossOriginRedirectNotOptInInMainFrameNavigation", "SameSiteCrossOriginNavigationNotOptInInMainFrameNavigation", "MemoryPressureOnTrigger", "MemoryPressureAfterTriggered", "PrerenderingDisabledByDevTools", "SpeculationRuleRemoved", "ActivatedWithAuxiliaryBrowsingContexts", "MaxNumOfRunningEagerPrerendersExceeded", "MaxNumOfRunningNonEagerPrerendersExceeded", "MaxNumOfRunningEmbedderPrerendersExceeded", "PrerenderingUrlHasEffectiveUrl", "RedirectedPrerenderingUrlHasEffectiveUrl", "ActivationUrlHasEffectiveUrl", "JavaScriptInterfaceAdded", "JavaScriptInterfaceRemoved", "AllPrerenderingCanceled", "WindowClosed", "SlowNetwork", "OtherPrerenderedPageActivated", "V8OptimizerDisabled", "PrerenderFailedDuringPrefetch", "BrowsingDataRemoved", "PrerenderHostReused"]
 """List of FinalStatus reasons for Prerender2."""
 
 

@@ -4,7 +4,8 @@
 
 """CDP WebAudio Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -29,202 +30,333 @@ if TYPE_CHECKING:
 class WebAudioRegistration:
     """Event registration interface for WebAudio domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "WebAudio"
+        self._mode = mode  # 'register' or 'unregister'
 
     def contextCreated(
         self,
-        callback: Callable[['ContextCreatedEvent', Optional[str]], None],
+        callback: Union[Callable[['ContextCreatedEvent', Optional[str]], None], Callable[['ContextCreatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for contextCreated events.
+        Register or unregister a callback for contextCreated events.
         
         Notifies that a new BaseAudioContext has been created.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("WebAudio.contextCreated", callback)
+        if self._mode == 'register':
+            self._registry.register("WebAudio.contextCreated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("WebAudio.contextCreated", callback)
 
     def contextWillBeDestroyed(
         self,
-        callback: Callable[['ContextWillBeDestroyedEvent', Optional[str]], None],
+        callback: Union[Callable[['ContextWillBeDestroyedEvent', Optional[str]], None], Callable[['ContextWillBeDestroyedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for contextWillBeDestroyed events.
+        Register or unregister a callback for contextWillBeDestroyed events.
         
         Notifies that an existing BaseAudioContext will be destroyed.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("WebAudio.contextWillBeDestroyed", callback)
+        if self._mode == 'register':
+            self._registry.register("WebAudio.contextWillBeDestroyed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("WebAudio.contextWillBeDestroyed", callback)
 
     def contextChanged(
         self,
-        callback: Callable[['ContextChangedEvent', Optional[str]], None],
+        callback: Union[Callable[['ContextChangedEvent', Optional[str]], None], Callable[['ContextChangedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for contextChanged events.
+        Register or unregister a callback for contextChanged events.
         
         Notifies that existing BaseAudioContext has changed some properties (id stays the same)..
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("WebAudio.contextChanged", callback)
+        if self._mode == 'register':
+            self._registry.register("WebAudio.contextChanged", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("WebAudio.contextChanged", callback)
 
     def audioListenerCreated(
         self,
-        callback: Callable[['AudioListenerCreatedEvent', Optional[str]], None],
+        callback: Union[Callable[['AudioListenerCreatedEvent', Optional[str]], None], Callable[['AudioListenerCreatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for audioListenerCreated events.
+        Register or unregister a callback for audioListenerCreated events.
         
         Notifies that the construction of an AudioListener has finished.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("WebAudio.audioListenerCreated", callback)
+        if self._mode == 'register':
+            self._registry.register("WebAudio.audioListenerCreated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("WebAudio.audioListenerCreated", callback)
 
     def audioListenerWillBeDestroyed(
         self,
-        callback: Callable[['AudioListenerWillBeDestroyedEvent', Optional[str]], None],
+        callback: Union[Callable[['AudioListenerWillBeDestroyedEvent', Optional[str]], None], Callable[['AudioListenerWillBeDestroyedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for audioListenerWillBeDestroyed events.
+        Register or unregister a callback for audioListenerWillBeDestroyed events.
         
         Notifies that a new AudioListener has been created.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("WebAudio.audioListenerWillBeDestroyed", callback)
+        if self._mode == 'register':
+            self._registry.register("WebAudio.audioListenerWillBeDestroyed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("WebAudio.audioListenerWillBeDestroyed", callback)
 
     def audioNodeCreated(
         self,
-        callback: Callable[['AudioNodeCreatedEvent', Optional[str]], None],
+        callback: Union[Callable[['AudioNodeCreatedEvent', Optional[str]], None], Callable[['AudioNodeCreatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for audioNodeCreated events.
+        Register or unregister a callback for audioNodeCreated events.
         
         Notifies that a new AudioNode has been created.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("WebAudio.audioNodeCreated", callback)
+        if self._mode == 'register':
+            self._registry.register("WebAudio.audioNodeCreated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("WebAudio.audioNodeCreated", callback)
 
     def audioNodeWillBeDestroyed(
         self,
-        callback: Callable[['AudioNodeWillBeDestroyedEvent', Optional[str]], None],
+        callback: Union[Callable[['AudioNodeWillBeDestroyedEvent', Optional[str]], None], Callable[['AudioNodeWillBeDestroyedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for audioNodeWillBeDestroyed events.
+        Register or unregister a callback for audioNodeWillBeDestroyed events.
         
         Notifies that an existing AudioNode has been destroyed.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("WebAudio.audioNodeWillBeDestroyed", callback)
+        if self._mode == 'register':
+            self._registry.register("WebAudio.audioNodeWillBeDestroyed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("WebAudio.audioNodeWillBeDestroyed", callback)
 
     def audioParamCreated(
         self,
-        callback: Callable[['AudioParamCreatedEvent', Optional[str]], None],
+        callback: Union[Callable[['AudioParamCreatedEvent', Optional[str]], None], Callable[['AudioParamCreatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for audioParamCreated events.
+        Register or unregister a callback for audioParamCreated events.
         
         Notifies that a new AudioParam has been created.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("WebAudio.audioParamCreated", callback)
+        if self._mode == 'register':
+            self._registry.register("WebAudio.audioParamCreated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("WebAudio.audioParamCreated", callback)
 
     def audioParamWillBeDestroyed(
         self,
-        callback: Callable[['AudioParamWillBeDestroyedEvent', Optional[str]], None],
+        callback: Union[Callable[['AudioParamWillBeDestroyedEvent', Optional[str]], None], Callable[['AudioParamWillBeDestroyedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for audioParamWillBeDestroyed events.
+        Register or unregister a callback for audioParamWillBeDestroyed events.
         
         Notifies that an existing AudioParam has been destroyed.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("WebAudio.audioParamWillBeDestroyed", callback)
+        if self._mode == 'register':
+            self._registry.register("WebAudio.audioParamWillBeDestroyed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("WebAudio.audioParamWillBeDestroyed", callback)
 
     def nodesConnected(
         self,
-        callback: Callable[['NodesConnectedEvent', Optional[str]], None],
+        callback: Union[Callable[['NodesConnectedEvent', Optional[str]], None], Callable[['NodesConnectedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for nodesConnected events.
+        Register or unregister a callback for nodesConnected events.
         
         Notifies that two AudioNodes are connected.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("WebAudio.nodesConnected", callback)
+        if self._mode == 'register':
+            self._registry.register("WebAudio.nodesConnected", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("WebAudio.nodesConnected", callback)
 
     def nodesDisconnected(
         self,
-        callback: Callable[['NodesDisconnectedEvent', Optional[str]], None],
+        callback: Union[Callable[['NodesDisconnectedEvent', Optional[str]], None], Callable[['NodesDisconnectedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for nodesDisconnected events.
+        Register or unregister a callback for nodesDisconnected events.
         
         Notifies that AudioNodes are disconnected. The destination can be null, and it means all the outgoing connections from the source are disconnected.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("WebAudio.nodesDisconnected", callback)
+        if self._mode == 'register':
+            self._registry.register("WebAudio.nodesDisconnected", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("WebAudio.nodesDisconnected", callback)
 
     def nodeParamConnected(
         self,
-        callback: Callable[['NodeParamConnectedEvent', Optional[str]], None],
+        callback: Union[Callable[['NodeParamConnectedEvent', Optional[str]], None], Callable[['NodeParamConnectedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for nodeParamConnected events.
+        Register or unregister a callback for nodeParamConnected events.
         
         Notifies that an AudioNode is connected to an AudioParam.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("WebAudio.nodeParamConnected", callback)
+        if self._mode == 'register':
+            self._registry.register("WebAudio.nodeParamConnected", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("WebAudio.nodeParamConnected", callback)
 
     def nodeParamDisconnected(
         self,
-        callback: Callable[['NodeParamDisconnectedEvent', Optional[str]], None],
+        callback: Union[Callable[['NodeParamDisconnectedEvent', Optional[str]], None], Callable[['NodeParamDisconnectedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for nodeParamDisconnected events.
+        Register or unregister a callback for nodeParamDisconnected events.
         
         Notifies that an AudioNode is disconnected to an AudioParam.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("WebAudio.nodeParamDisconnected", callback)
+        if self._mode == 'register':
+            self._registry.register("WebAudio.nodeParamDisconnected", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("WebAudio.nodeParamDisconnected", callback)
 

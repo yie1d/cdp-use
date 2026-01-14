@@ -4,9 +4,8 @@
 
 """CDP SystemInfo Domain Types"""
 
-from typing import Any, Dict, List
-from typing_extensions import Literal
-from typing_extensions import NotRequired, TypedDict
+from typing import Any, Dict, List, NotRequired, TypedDict
+from typing import Literal
 
 class GPUDevice(TypedDict):
     """Describes a single graphics processor (GPU)."""
@@ -79,21 +78,6 @@ ImageType = Literal["jpeg", "webp", "unknown"]
 
 
 
-class ImageDecodeAcceleratorCapability(TypedDict):
-    """Describes a supported image decoding profile with its associated minimum and
-maximum resolutions and subsampling."""
-
-    imageType: "ImageType"
-    """Image coded, e.g. Jpeg."""
-    maxDimensions: "Size"
-    """Maximum supported dimensions of the image in pixels."""
-    minDimensions: "Size"
-    """Minimum supported dimensions of the image in pixels."""
-    subsamplings: "List[SubsamplingFormat]"
-    """Optional array of supported subsampling formats, e.g. 4:2:0, if known."""
-
-
-
 class GPUInfo(TypedDict):
     """Provides information about the GPU(s) on the system."""
 
@@ -109,8 +93,6 @@ class GPUInfo(TypedDict):
     """Supported accelerated video decoding capabilities."""
     videoEncoding: "List[VideoEncodeAcceleratorCapability]"
     """Supported accelerated video encoding capabilities."""
-    imageDecoding: "List[ImageDecodeAcceleratorCapability]"
-    """Supported accelerated image decoding capabilities."""
 
 
 

@@ -4,8 +4,7 @@
 
 """CDP Runtime Domain Types"""
 
-from typing import Any, Dict, List
-from typing_extensions import NotRequired, TypedDict
+from typing import Any, Dict, List, NotRequired, TypedDict
 
 ScriptId = str
 """Unique script identifier."""

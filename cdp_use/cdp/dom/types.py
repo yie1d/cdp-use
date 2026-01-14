@@ -4,9 +4,8 @@
 
 """CDP DOM Domain Types"""
 
-from typing import Any, List
-from typing_extensions import Literal
-from typing_extensions import NotRequired, TypedDict
+from typing import Any, List, NotRequired, TypedDict
+from typing import Literal
 
 from typing import TYPE_CHECKING
 
@@ -24,6 +23,11 @@ front-end."""
 
 
 
+StyleSheetId = str
+"""Unique identifier for a CSS stylesheet."""
+
+
+
 class BackendNode(TypedDict):
     """Backend node with a friendly name."""
 
@@ -35,7 +39,7 @@ class BackendNode(TypedDict):
 
 
 
-PseudoType = Literal["first-line", "first-letter", "checkmark", "before", "after", "picker-icon", "marker", "backdrop", "column", "selection", "search-text", "target-text", "spelling-error", "grammar-error", "highlight", "first-line-inherited", "scroll-marker", "scroll-marker-group", "scroll-button", "scrollbar", "scrollbar-thumb", "scrollbar-button", "scrollbar-track", "scrollbar-track-piece", "scrollbar-corner", "resizer", "input-list-button", "view-transition", "view-transition-group", "view-transition-image-pair", "view-transition-group-children", "view-transition-old", "view-transition-new", "placeholder", "file-selector-button", "details-content", "picker", "permission-icon"]
+PseudoType = Literal["first-line", "first-letter", "checkmark", "before", "after", "picker-icon", "interest-hint", "marker", "backdrop", "column", "selection", "search-text", "target-text", "spelling-error", "grammar-error", "highlight", "first-line-inherited", "scroll-marker", "scroll-marker-group", "scroll-button", "scrollbar", "scrollbar-thumb", "scrollbar-button", "scrollbar-track", "scrollbar-track-piece", "scrollbar-corner", "resizer", "input-list-button", "view-transition", "view-transition-group", "view-transition-image-pair", "view-transition-group-children", "view-transition-old", "view-transition-new", "placeholder", "file-selector-button", "details-content", "picker", "permission-icon", "overscroll-area-parent"]
 """Pseudo element type."""
 
 
@@ -135,6 +139,8 @@ The property is always undefined now."""
     compatibilityMode: "NotRequired[CompatibilityMode]"
     assignedSlot: "NotRequired[BackendNode]"
     isScrollable: "NotRequired[bool]"
+    affectedByStartingStyles: "NotRequired[bool]"
+    adoptedStyleSheets: "NotRequired[List[StyleSheetId]]"
 
 
 

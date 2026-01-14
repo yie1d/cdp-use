@@ -4,7 +4,8 @@
 
 """CDP Animation Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,67 +16,108 @@ if TYPE_CHECKING:
 class AnimationRegistration:
     """Event registration interface for Animation domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Animation"
+        self._mode = mode  # 'register' or 'unregister'
 
     def animationCanceled(
         self,
-        callback: Callable[['AnimationCanceledEvent', Optional[str]], None],
+        callback: Union[Callable[['AnimationCanceledEvent', Optional[str]], None], Callable[['AnimationCanceledEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for animationCanceled events.
+        Register or unregister a callback for animationCanceled events.
         
         Event for when an animation has been cancelled.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Animation.animationCanceled", callback)
+        if self._mode == 'register':
+            self._registry.register("Animation.animationCanceled", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Animation.animationCanceled", callback)
 
     def animationCreated(
         self,
-        callback: Callable[['AnimationCreatedEvent', Optional[str]], None],
+        callback: Union[Callable[['AnimationCreatedEvent', Optional[str]], None], Callable[['AnimationCreatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for animationCreated events.
+        Register or unregister a callback for animationCreated events.
         
         Event for each animation that has been created.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Animation.animationCreated", callback)
+        if self._mode == 'register':
+            self._registry.register("Animation.animationCreated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Animation.animationCreated", callback)
 
     def animationStarted(
         self,
-        callback: Callable[['AnimationStartedEvent', Optional[str]], None],
+        callback: Union[Callable[['AnimationStartedEvent', Optional[str]], None], Callable[['AnimationStartedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for animationStarted events.
+        Register or unregister a callback for animationStarted events.
         
         Event for animation that has been started.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Animation.animationStarted", callback)
+        if self._mode == 'register':
+            self._registry.register("Animation.animationStarted", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Animation.animationStarted", callback)
 
     def animationUpdated(
         self,
-        callback: Callable[['AnimationUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['AnimationUpdatedEvent', Optional[str]], None], Callable[['AnimationUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for animationUpdated events.
+        Register or unregister a callback for animationUpdated events.
         
         Event for animation that has been updated.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Animation.animationUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("Animation.animationUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Animation.animationUpdated", callback)
 

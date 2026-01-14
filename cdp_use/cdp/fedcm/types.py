@@ -4,8 +4,8 @@
 
 """CDP FedCm Domain Types"""
 
-from typing_extensions import Literal
-from typing_extensions import NotRequired, TypedDict
+from typing import NotRequired, TypedDict
+from typing import Literal
 
 LoginState = Literal["SignIn", "SignUp"]
 """Whether this is a sign-up or sign-in action for this account, i.e.

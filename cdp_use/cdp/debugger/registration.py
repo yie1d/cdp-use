@@ -4,7 +4,8 @@
 
 """CDP Debugger Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,16 +16,18 @@ if TYPE_CHECKING:
 class DebuggerRegistration:
     """Event registration interface for Debugger domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Debugger"
+        self._mode = mode  # 'register' or 'unregister'
 
     def breakpointResolved(
         self,
-        callback: Callable[['BreakpointResolvedEvent', Optional[str]], None],
+        callback: Union[Callable[['BreakpointResolvedEvent', Optional[str]], None], Callable[['BreakpointResolvedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for breakpointResolved events.
+        Register or unregister a callback for breakpointResolved events.
         
         Fired when breakpoint is resolved to an actual script and location.
 Deprecated in favor of `resolvedBreakpoints` in the `scriptParsed` event.
@@ -32,60 +35,100 @@ Deprecated in favor of `resolvedBreakpoints` in the `scriptParsed` event.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Debugger.breakpointResolved", callback)
+        if self._mode == 'register':
+            self._registry.register("Debugger.breakpointResolved", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Debugger.breakpointResolved", callback)
 
     def paused(
         self,
-        callback: Callable[['PausedEvent', Optional[str]], None],
+        callback: Union[Callable[['PausedEvent', Optional[str]], None], Callable[['PausedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for paused events.
+        Register or unregister a callback for paused events.
         
         Fired when the virtual machine stopped on breakpoint or exception or any other stop criteria.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Debugger.paused", callback)
+        if self._mode == 'register':
+            self._registry.register("Debugger.paused", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Debugger.paused", callback)
 
     def resumed(
         self,
-        callback: Callable[['ResumedEvent', Optional[str]], None],
+        callback: Union[Callable[['ResumedEvent', Optional[str]], None], Callable[['ResumedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for resumed events.
+        Register or unregister a callback for resumed events.
         
         Fired when the virtual machine resumed execution.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Debugger.resumed", callback)
+        if self._mode == 'register':
+            self._registry.register("Debugger.resumed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Debugger.resumed", callback)
 
     def scriptFailedToParse(
         self,
-        callback: Callable[['ScriptFailedToParseEvent', Optional[str]], None],
+        callback: Union[Callable[['ScriptFailedToParseEvent', Optional[str]], None], Callable[['ScriptFailedToParseEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for scriptFailedToParse events.
+        Register or unregister a callback for scriptFailedToParse events.
         
         Fired when virtual machine fails to parse the script.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Debugger.scriptFailedToParse", callback)
+        if self._mode == 'register':
+            self._registry.register("Debugger.scriptFailedToParse", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Debugger.scriptFailedToParse", callback)
 
     def scriptParsed(
         self,
-        callback: Callable[['ScriptParsedEvent', Optional[str]], None],
+        callback: Union[Callable[['ScriptParsedEvent', Optional[str]], None], Callable[['ScriptParsedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for scriptParsed events.
+        Register or unregister a callback for scriptParsed events.
         
         Fired when virtual machine parses script. This event is also fired for all known and uncollected
 scripts upon enabling debugger.
@@ -93,6 +136,15 @@ scripts upon enabling debugger.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Debugger.scriptParsed", callback)
+        if self._mode == 'register':
+            self._registry.register("Debugger.scriptParsed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Debugger.scriptParsed", callback)
 

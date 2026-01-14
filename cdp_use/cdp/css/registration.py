@@ -4,7 +4,8 @@
 
 """CDP CSS Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -22,16 +23,18 @@ if TYPE_CHECKING:
 class CSSRegistration:
     """Event registration interface for CSS domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "CSS"
+        self._mode = mode  # 'register' or 'unregister'
 
     def fontsUpdated(
         self,
-        callback: Callable[['FontsUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['FontsUpdatedEvent', Optional[str]], None], Callable[['FontsUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for fontsUpdated events.
+        Register or unregister a callback for fontsUpdated events.
         
         Fires whenever a web font is updated.  A non-empty font parameter indicates a successfully loaded
 web font.
@@ -39,15 +42,25 @@ web font.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("CSS.fontsUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("CSS.fontsUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("CSS.fontsUpdated", callback)
 
     def mediaQueryResultChanged(
         self,
-        callback: Callable[['MediaQueryResultChangedEvent', Optional[str]], None],
+        callback: Union[Callable[['MediaQueryResultChangedEvent', Optional[str]], None], Callable[['MediaQueryResultChangedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for mediaQueryResultChanged events.
+        Register or unregister a callback for mediaQueryResultChanged events.
         
         Fires whenever a MediaQuery result changes (for example, after a browser window has been
 resized.) The current implementation considers only viewport-dependent media features.
@@ -55,64 +68,113 @@ resized.) The current implementation considers only viewport-dependent media fea
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("CSS.mediaQueryResultChanged", callback)
+        if self._mode == 'register':
+            self._registry.register("CSS.mediaQueryResultChanged", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("CSS.mediaQueryResultChanged", callback)
 
     def styleSheetAdded(
         self,
-        callback: Callable[['StyleSheetAddedEvent', Optional[str]], None],
+        callback: Union[Callable[['StyleSheetAddedEvent', Optional[str]], None], Callable[['StyleSheetAddedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for styleSheetAdded events.
+        Register or unregister a callback for styleSheetAdded events.
         
         Fired whenever an active document stylesheet is added.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("CSS.styleSheetAdded", callback)
+        if self._mode == 'register':
+            self._registry.register("CSS.styleSheetAdded", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("CSS.styleSheetAdded", callback)
 
     def styleSheetChanged(
         self,
-        callback: Callable[['StyleSheetChangedEvent', Optional[str]], None],
+        callback: Union[Callable[['StyleSheetChangedEvent', Optional[str]], None], Callable[['StyleSheetChangedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for styleSheetChanged events.
+        Register or unregister a callback for styleSheetChanged events.
         
         Fired whenever a stylesheet is changed as a result of the client operation.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("CSS.styleSheetChanged", callback)
+        if self._mode == 'register':
+            self._registry.register("CSS.styleSheetChanged", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("CSS.styleSheetChanged", callback)
 
     def styleSheetRemoved(
         self,
-        callback: Callable[['StyleSheetRemovedEvent', Optional[str]], None],
+        callback: Union[Callable[['StyleSheetRemovedEvent', Optional[str]], None], Callable[['StyleSheetRemovedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for styleSheetRemoved events.
+        Register or unregister a callback for styleSheetRemoved events.
         
         Fired whenever an active document stylesheet is removed.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("CSS.styleSheetRemoved", callback)
+        if self._mode == 'register':
+            self._registry.register("CSS.styleSheetRemoved", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("CSS.styleSheetRemoved", callback)
 
     def computedStyleUpdated(
         self,
-        callback: Callable[['ComputedStyleUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['ComputedStyleUpdatedEvent', Optional[str]], None], Callable[['ComputedStyleUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for computedStyleUpdated events.
+        Register or unregister a callback for computedStyleUpdated events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("CSS.computedStyleUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("CSS.computedStyleUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("CSS.computedStyleUpdated", callback)
 

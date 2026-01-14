@@ -4,8 +4,7 @@
 
 """CDP Target Domain Commands"""
 
-from typing import List
-from typing_extensions import NotRequired, TypedDict
+from typing import List, NotRequired, TypedDict
 
 from typing import TYPE_CHECKING
 
@@ -87,6 +86,8 @@ class CreateBrowserContextReturns(TypedDict):
 class GetBrowserContextsReturns(TypedDict):
     browserContextIds: "List[BrowserContextID]"
     """An array of browser context ids."""
+    defaultBrowserContextId: "BrowserContextID"
+    """The id of the default browser context if available."""
 
 
 
@@ -223,3 +224,29 @@ class SetRemoteLocationsParameters(TypedDict):
     """List of remote locations."""
 
 
+
+
+
+class GetDevToolsTargetParameters(TypedDict):
+    targetId: "TargetID"
+    """Page or tab target ID."""
+
+
+class GetDevToolsTargetReturns(TypedDict):
+    targetId: "TargetID"
+    """The targetId of DevTools page target if exists."""
+
+
+
+class OpenDevToolsParameters(TypedDict):
+    targetId: "TargetID"
+    """This can be the page or tab target ID."""
+    panelId: "NotRequired[str]"
+    """The id of the panel we want DevTools to open initially. Currently
+supported panels are elements, console, network, sources, resources
+and performance."""
+
+
+class OpenDevToolsReturns(TypedDict):
+    targetId: "TargetID"
+    """The targetId of DevTools page target."""

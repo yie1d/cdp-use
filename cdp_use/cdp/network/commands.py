@@ -4,8 +4,7 @@
 
 """CDP Network Domain Commands"""
 
-from typing import List
-from typing_extensions import NotRequired, TypedDict
+from typing import List, NotRequired, TypedDict
 
 from typing import TYPE_CHECKING
 
@@ -15,6 +14,7 @@ if TYPE_CHECKING:
     from ..io.types import StreamHandle
     from ..page.types import FrameId
     from .types import AuthChallengeResponse
+    from .types import BlockPattern
     from .types import ConnectionType
     from .types import ContentEncoding
     from .types import Cookie
@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from .types import InterceptionId
     from .types import LoadNetworkResourceOptions
     from .types import LoadNetworkResourcePageResult
+    from .types import NetworkConditions
     from .types import RequestId
     from .types import RequestPattern
     from .types import SecurityIsolationStatus
@@ -126,6 +127,38 @@ class EmulateNetworkConditionsParameters(TypedDict):
 
 
 
+class EmulateNetworkConditionsByRuleParameters(TypedDict):
+    offline: "bool"
+    """True to emulate internet disconnection."""
+    matchedNetworkConditions: "List[NetworkConditions]"
+    """Configure conditions for matching requests. If multiple entries match a request, the first entry wins.  Global
+conditions can be configured by leaving the urlPattern for the conditions empty. These global conditions are
+also applied for throttling of p2p connections."""
+
+
+class EmulateNetworkConditionsByRuleReturns(TypedDict):
+    ruleIds: "List[str]"
+    """An id for each entry in matchedNetworkConditions. The id will be included in the requestWillBeSentExtraInfo for
+requests affected by a rule."""
+
+
+
+class OverrideNetworkStateParameters(TypedDict):
+    offline: "bool"
+    """True to emulate internet disconnection."""
+    latency: "float"
+    """Minimum latency from request sent to response headers received (ms)."""
+    downloadThroughput: "float"
+    """Maximal aggregated download throughput (bytes/sec). -1 disables download throttling."""
+    uploadThroughput: "float"
+    """Maximal aggregated upload throughput (bytes/sec).  -1 disables upload throttling."""
+    connectionType: "NotRequired[ConnectionType]"
+    """Connection type if known."""
+
+
+
+
+
 class EnableParameters(TypedDict, total=False):
     maxTotalBufferSize: "int"
     """Buffer size in bytes to use when preserving network payloads (XHRs, etc)."""
@@ -135,6 +168,22 @@ class EnableParameters(TypedDict, total=False):
     """Longest post body size (in bytes) that would be included in requestWillBeSent notification"""
     reportDirectSocketTraffic: "bool"
     """Whether DirectSocket chunk send/receive events should be reported."""
+    enableDurableMessages: "bool"
+    """Enable storing response bodies outside of renderer, so that these survive
+a cross-process navigation. Requires maxTotalBufferSize to be set.
+Currently defaults to false. This field is being deprecated in favor of the dedicated
+configureDurableMessages command, due to the possibility of deadlocks when awaiting
+Network.enable before issuing Runtime.runIfWaitingForDebugger."""
+
+
+
+
+
+class ConfigureDurableMessagesParameters(TypedDict, total=False):
+    maxTotalBufferSize: "int"
+    """Buffer size in bytes to use when preserving network payloads (XHRs, etc)."""
+    maxResourceBufferSize: "int"
+    """Per-resource buffer size in bytes to use when preserving network payloads (XHRs, etc)."""
 
 
 
@@ -240,7 +289,10 @@ class SearchInResponseBodyReturns(TypedDict):
 
 
 
-class SetBlockedURLsParameters(TypedDict):
+class SetBlockedURLsParameters(TypedDict, total=False):
+    urlPatterns: "List[BlockPattern]"
+    """Patterns to match in the order in which they are given. These patterns
+also take precedence over any wildcard patterns defined in `urls`."""
     urls: "List[str]"
     """URL patterns to block. Wildcards ('*') are allowed."""
 
@@ -377,6 +429,25 @@ class EnableReportingApiParameters(TypedDict):
     """Whether to enable or disable events for the Reporting API"""
 
 
+
+
+
+class EnableDeviceBoundSessionsParameters(TypedDict):
+    enable: "bool"
+    """Whether to enable or disable events."""
+
+
+
+
+
+class FetchSchemefulSiteParameters(TypedDict):
+    origin: "str"
+    """The URL origin."""
+
+
+class FetchSchemefulSiteReturns(TypedDict):
+    schemefulSite: "str"
+    """The corresponding schemeful site."""
 
 
 

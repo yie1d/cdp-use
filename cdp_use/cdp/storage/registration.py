@@ -4,7 +4,8 @@
 
 """CDP Storage Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -31,76 +32,118 @@ if TYPE_CHECKING:
 class StorageRegistration:
     """Event registration interface for Storage domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Storage"
+        self._mode = mode  # 'register' or 'unregister'
 
     def cacheStorageContentUpdated(
         self,
-        callback: Callable[['CacheStorageContentUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['CacheStorageContentUpdatedEvent', Optional[str]], None], Callable[['CacheStorageContentUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for cacheStorageContentUpdated events.
+        Register or unregister a callback for cacheStorageContentUpdated events.
         
         A cache's contents have been modified.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Storage.cacheStorageContentUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("Storage.cacheStorageContentUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Storage.cacheStorageContentUpdated", callback)
 
     def cacheStorageListUpdated(
         self,
-        callback: Callable[['CacheStorageListUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['CacheStorageListUpdatedEvent', Optional[str]], None], Callable[['CacheStorageListUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for cacheStorageListUpdated events.
+        Register or unregister a callback for cacheStorageListUpdated events.
         
         A cache has been added/deleted.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Storage.cacheStorageListUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("Storage.cacheStorageListUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Storage.cacheStorageListUpdated", callback)
 
     def indexedDBContentUpdated(
         self,
-        callback: Callable[['IndexedDBContentUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['IndexedDBContentUpdatedEvent', Optional[str]], None], Callable[['IndexedDBContentUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for indexedDBContentUpdated events.
+        Register or unregister a callback for indexedDBContentUpdated events.
         
         The origin's IndexedDB object store has been modified.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Storage.indexedDBContentUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("Storage.indexedDBContentUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Storage.indexedDBContentUpdated", callback)
 
     def indexedDBListUpdated(
         self,
-        callback: Callable[['IndexedDBListUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['IndexedDBListUpdatedEvent', Optional[str]], None], Callable[['IndexedDBListUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for indexedDBListUpdated events.
+        Register or unregister a callback for indexedDBListUpdated events.
         
         The origin's IndexedDB database list has been modified.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Storage.indexedDBListUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("Storage.indexedDBListUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Storage.indexedDBListUpdated", callback)
 
     def interestGroupAccessed(
         self,
-        callback: Callable[['InterestGroupAccessedEvent', Optional[str]], None],
+        callback: Union[Callable[['InterestGroupAccessedEvent', Optional[str]], None], Callable[['InterestGroupAccessedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for interestGroupAccessed events.
+        Register or unregister a callback for interestGroupAccessed events.
         
         One of the interest groups was accessed. Note that these events are global
 to all targets sharing an interest group store.
@@ -108,15 +151,25 @@ to all targets sharing an interest group store.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Storage.interestGroupAccessed", callback)
+        if self._mode == 'register':
+            self._registry.register("Storage.interestGroupAccessed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Storage.interestGroupAccessed", callback)
 
     def interestGroupAuctionEventOccurred(
         self,
-        callback: Callable[['InterestGroupAuctionEventOccurredEvent', Optional[str]], None],
+        callback: Union[Callable[['InterestGroupAuctionEventOccurredEvent', Optional[str]], None], Callable[['InterestGroupAuctionEventOccurredEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for interestGroupAuctionEventOccurred events.
+        Register or unregister a callback for interestGroupAuctionEventOccurred events.
         
         An auction involving interest groups is taking place. These events are
 target-specific.
@@ -124,15 +177,25 @@ target-specific.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Storage.interestGroupAuctionEventOccurred", callback)
+        if self._mode == 'register':
+            self._registry.register("Storage.interestGroupAuctionEventOccurred", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Storage.interestGroupAuctionEventOccurred", callback)
 
     def interestGroupAuctionNetworkRequestCreated(
         self,
-        callback: Callable[['InterestGroupAuctionNetworkRequestCreatedEvent', Optional[str]], None],
+        callback: Union[Callable[['InterestGroupAuctionNetworkRequestCreatedEvent', Optional[str]], None], Callable[['InterestGroupAuctionNetworkRequestCreatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for interestGroupAuctionNetworkRequestCreated events.
+        Register or unregister a callback for interestGroupAuctionNetworkRequestCreated events.
         
         Specifies which auctions a particular network fetch may be related to, and
 in what role. Note that it is not ordered with respect to
@@ -142,15 +205,25 @@ loadingFailed).
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Storage.interestGroupAuctionNetworkRequestCreated", callback)
+        if self._mode == 'register':
+            self._registry.register("Storage.interestGroupAuctionNetworkRequestCreated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Storage.interestGroupAuctionNetworkRequestCreated", callback)
 
     def sharedStorageAccessed(
         self,
-        callback: Callable[['SharedStorageAccessedEvent', Optional[str]], None],
+        callback: Union[Callable[['SharedStorageAccessedEvent', Optional[str]], None], Callable[['SharedStorageAccessedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for sharedStorageAccessed events.
+        Register or unregister a callback for sharedStorageAccessed events.
         
         Shared storage was accessed by the associated page.
 The following parameters are included in all events.
@@ -158,15 +231,25 @@ The following parameters are included in all events.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Storage.sharedStorageAccessed", callback)
+        if self._mode == 'register':
+            self._registry.register("Storage.sharedStorageAccessed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Storage.sharedStorageAccessed", callback)
 
     def sharedStorageWorkletOperationExecutionFinished(
         self,
-        callback: Callable[['SharedStorageWorkletOperationExecutionFinishedEvent', Optional[str]], None],
+        callback: Union[Callable[['SharedStorageWorkletOperationExecutionFinishedEvent', Optional[str]], None], Callable[['SharedStorageWorkletOperationExecutionFinishedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for sharedStorageWorkletOperationExecutionFinished events.
+        Register or unregister a callback for sharedStorageWorkletOperationExecutionFinished events.
         
         A shared storage run or selectURL operation finished its execution.
 The following parameters are included in all events.
@@ -174,84 +257,153 @@ The following parameters are included in all events.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Storage.sharedStorageWorkletOperationExecutionFinished", callback)
+        if self._mode == 'register':
+            self._registry.register("Storage.sharedStorageWorkletOperationExecutionFinished", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Storage.sharedStorageWorkletOperationExecutionFinished", callback)
 
     def storageBucketCreatedOrUpdated(
         self,
-        callback: Callable[['StorageBucketCreatedOrUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['StorageBucketCreatedOrUpdatedEvent', Optional[str]], None], Callable[['StorageBucketCreatedOrUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for storageBucketCreatedOrUpdated events.
+        Register or unregister a callback for storageBucketCreatedOrUpdated events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Storage.storageBucketCreatedOrUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("Storage.storageBucketCreatedOrUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Storage.storageBucketCreatedOrUpdated", callback)
 
     def storageBucketDeleted(
         self,
-        callback: Callable[['StorageBucketDeletedEvent', Optional[str]], None],
+        callback: Union[Callable[['StorageBucketDeletedEvent', Optional[str]], None], Callable[['StorageBucketDeletedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for storageBucketDeleted events.
+        Register or unregister a callback for storageBucketDeleted events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Storage.storageBucketDeleted", callback)
+        if self._mode == 'register':
+            self._registry.register("Storage.storageBucketDeleted", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Storage.storageBucketDeleted", callback)
 
     def attributionReportingSourceRegistered(
         self,
-        callback: Callable[['AttributionReportingSourceRegisteredEvent', Optional[str]], None],
+        callback: Union[Callable[['AttributionReportingSourceRegisteredEvent', Optional[str]], None], Callable[['AttributionReportingSourceRegisteredEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for attributionReportingSourceRegistered events.
+        Register or unregister a callback for attributionReportingSourceRegistered events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Storage.attributionReportingSourceRegistered", callback)
+        if self._mode == 'register':
+            self._registry.register("Storage.attributionReportingSourceRegistered", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Storage.attributionReportingSourceRegistered", callback)
 
     def attributionReportingTriggerRegistered(
         self,
-        callback: Callable[['AttributionReportingTriggerRegisteredEvent', Optional[str]], None],
+        callback: Union[Callable[['AttributionReportingTriggerRegisteredEvent', Optional[str]], None], Callable[['AttributionReportingTriggerRegisteredEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for attributionReportingTriggerRegistered events.
+        Register or unregister a callback for attributionReportingTriggerRegistered events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Storage.attributionReportingTriggerRegistered", callback)
+        if self._mode == 'register':
+            self._registry.register("Storage.attributionReportingTriggerRegistered", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Storage.attributionReportingTriggerRegistered", callback)
 
     def attributionReportingReportSent(
         self,
-        callback: Callable[['AttributionReportingReportSentEvent', Optional[str]], None],
+        callback: Union[Callable[['AttributionReportingReportSentEvent', Optional[str]], None], Callable[['AttributionReportingReportSentEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for attributionReportingReportSent events.
+        Register or unregister a callback for attributionReportingReportSent events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Storage.attributionReportingReportSent", callback)
+        if self._mode == 'register':
+            self._registry.register("Storage.attributionReportingReportSent", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Storage.attributionReportingReportSent", callback)
 
     def attributionReportingVerboseDebugReportSent(
         self,
-        callback: Callable[['AttributionReportingVerboseDebugReportSentEvent', Optional[str]], None],
+        callback: Union[Callable[['AttributionReportingVerboseDebugReportSentEvent', Optional[str]], None], Callable[['AttributionReportingVerboseDebugReportSentEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for attributionReportingVerboseDebugReportSent events.
+        Register or unregister a callback for attributionReportingVerboseDebugReportSent events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Storage.attributionReportingVerboseDebugReportSent", callback)
+        if self._mode == 'register':
+            self._registry.register("Storage.attributionReportingVerboseDebugReportSent", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Storage.attributionReportingVerboseDebugReportSent", callback)
 

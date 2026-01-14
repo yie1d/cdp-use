@@ -4,8 +4,7 @@
 
 """CDP Autofill Domain Commands"""
 
-from typing import List
-from typing_extensions import NotRequired, TypedDict
+from typing import List, NotRequired, TypedDict
 
 from typing import TYPE_CHECKING
 
@@ -20,8 +19,10 @@ class TriggerParameters(TypedDict):
     """Identifies a field that serves as an anchor for autofill."""
     frameId: "NotRequired[FrameId]"
     """Identifies the frame that field belongs to."""
-    card: "CreditCard"
-    """Credit card information to fill out the form. Credit card data is not saved."""
+    card: "NotRequired[CreditCard]"
+    """Credit card information to fill out the form. Credit card data is not saved.  Mutually exclusive with `address`."""
+    address: "NotRequired[Address]"
+    """Address to fill out the form. Address data is not saved. Mutually exclusive with `card`."""
 
 
 

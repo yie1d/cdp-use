@@ -4,7 +4,7 @@
 
 """CDP HeapProfiler Domain Commands"""
 
-from typing_extensions import NotRequired, TypedDict
+from typing import NotRequired, TypedDict
 
 from typing import TYPE_CHECKING
 
@@ -55,6 +55,8 @@ class StartSamplingParameters(TypedDict, total=False):
     samplingInterval: "float"
     """Average sample interval in bytes. Poisson distribution is used for the intervals. The
 default value is 32768 bytes."""
+    stackDepth: "float"
+    """Maximum stack depth. The default value is 128."""
     includeObjectsCollectedByMajorGC: "bool"
     """By default, the sampling heap profiler reports only objects which are
 still alive when the profile is returned via getSamplingProfile or

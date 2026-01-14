@@ -4,21 +4,32 @@
 
 """CDP Event Registry"""
 
+import asyncio
+import inspect
 import logging
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from collections.abc import Awaitable
 
 logger = logging.getLogger(__name__)
+
+# Type alias for event handlers that can be sync or async
+EventHandler = Union[
+    Callable[[Any, Optional[str]], None],
+    Callable[[Any, Optional[str]], Awaitable[None]],
+]
 
 class EventRegistry:
     """Central registry for managing CDP event callbacks."""
 
     def __init__(self):
-        self._handlers: Dict[str, Callable[[Any, Optional[str]], None]] = {}
+        # Store handlers as list of (callback, is_once) tuples to support multiple listeners
+        self._handlers: Dict[str, List[Tuple[EventHandler, bool]]] = {}
 
     def register(
         self,
         method: str,
-        callback: Callable[[Any, Optional[str]], None],
+        callback: EventHandler,
+        once: bool = False,
     ) -> None:
         """
         Register a callback for a specific CDP event method.
@@ -27,19 +38,43 @@ class EventRegistry:
             method: The CDP method name (e.g., "Page.frameAttached")
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, the callback will be automatically removed after first execution.
         """
-        logger.debug(f"Registering handler for {method}")
-        self._handlers[method] = callback
+        logger.debug(f"Registering handler for {method} (once={once})")
+        if method not in self._handlers:
+            self._handlers[method] = []
+        self._handlers[method].append((callback, once))
 
-    def unregister(self, method: str) -> None:
+    def unregister(
+        self,
+        method: str,
+        callback: Optional[EventHandler] = None,
+    ) -> None:
         """
         Unregister a callback for a specific CDP event method.
         
         Args:
             method: The CDP method name to unregister
+            callback: Specific callback to remove. If None, removes all callbacks for this method.
         """
-        logger.debug(f"Unregistering handler for {method}")
-        self._handlers.pop(method, None)
+        if method not in self._handlers:
+            return
+        
+        if callback is None:
+            # Remove all handlers for this method
+            logger.debug(f"Unregistering all handlers for {method}")
+            del self._handlers[method]
+        else:
+            # Remove specific callback
+            self._handlers[method] = [
+                (cb, once) for cb, once in self._handlers[method]
+                if cb != callback
+            ]
+            logger.debug(f"Unregistered specific handler for {method}")
+            
+            # Clean up empty list
+            if not self._handlers[method]:
+                del self._handlers[method]
 
     async def handle_event(
         self,
@@ -58,24 +93,39 @@ class EventRegistry:
         Returns:
             True if a handler was found and called, False otherwise
         """
-        if method in self._handlers:
+        if method not in self._handlers:
+            return False
+        
+        # Track indices of one-time handlers to remove after execution
+        handlers_to_remove = []
+        
+        for i, (handler, is_once) in enumerate(self._handlers[method]):
             try:
-                import asyncio
-                import inspect
-                handler = self._handlers[method]
-                
                 # Check if handler is async
                 if inspect.iscoroutinefunction(handler):
-                    # Await async handlers
-                    await handler(params, session_id)
+                    # Run handler in background to avoid blocking the message receive loop.
+                    # Direct await would cause deadlock: handler waits for CDP response,
+                    # but response cannot be received because message loop is blocked.
+                    asyncio.create_task(handler(params, session_id))
                 else:
                     # Call sync handlers directly
                     handler(params, session_id)
-                return True
+                
+                # Mark one-time handler for removal
+                if is_once:
+                    handlers_to_remove.append(i)
             except Exception as e:
-                logger.error(f"Error in event handler for {method}: {e}")
-                return False
-        return False
+                logger.error(f"Error in event handler for {method}: {e}", exc_info=True)
+        
+        # Remove one-time handlers (iterate in reverse to avoid index issues)
+        for i in reversed(handlers_to_remove):
+            self._handlers[method].pop(i)
+        
+        # Clean up empty handler list
+        if method in self._handlers and not self._handlers[method]:
+            del self._handlers[method]
+        
+        return True
 
     def clear(self) -> None:
         """Clear all registered handlers."""

@@ -4,9 +4,8 @@
 
 """CDP Network Domain Types"""
 
-from typing import Any, Dict, List
-from typing_extensions import Literal
-from typing_extensions import NotRequired, TypedDict
+from typing import Any, Dict, List, NotRequired, TypedDict
+from typing import Literal
 
 from typing import TYPE_CHECKING
 
@@ -137,6 +136,11 @@ ResourcePriority = Literal["VeryLow", "Low", "Medium", "High", "VeryHigh"]
 
 
 
+RenderBlockingBehavior = Literal["Blocking", "InBodyParserBlocking", "NonBlocking", "NonBlockingDynamic", "PotentiallyBlocking"]
+"""The render blocking behavior of a resource request."""
+
+
+
 class PostDataEntry(TypedDict, total=False):
     """Post data entry for HTTP request"""
 
@@ -176,6 +180,8 @@ passed by the developer (e.g. via \"fetch\") as understood by the backend."""
     isSameSite: "NotRequired[bool]"
     """True if this resource request is considered to be the 'same site' as the
 request corresponding to the main frame."""
+    isAdRelated: "NotRequired[bool]"
+    """True when the resource request is ad-related."""
 
 
 
@@ -469,7 +475,10 @@ class Cookie(TypedDict):
     path: "str"
     """Cookie path."""
     expires: "float"
-    """Cookie expiration date as the number of seconds since the UNIX epoch."""
+    """Cookie expiration date as the number of seconds since the UNIX epoch.
+The value is set to -1 if the expiry date is not set.
+The value can be null for values that cannot be represented in
+JSON (±Inf)."""
     size: "int"
     """Cookie size."""
     httpOnly: "bool"
@@ -721,6 +730,38 @@ ContentEncoding = Literal["deflate", "gzip", "br", "zstd"]
 
 
 
+class NetworkConditions(TypedDict):
+    urlPattern: "str"
+    """Only matching requests will be affected by these conditions. Patterns use the URLPattern constructor string
+syntax (https://urlpattern.spec.whatwg.org/) and must be absolute. If the pattern is empty, all requests are
+matched (including p2p connections)."""
+    latency: "float"
+    """Minimum latency from request sent to response headers received (ms)."""
+    downloadThroughput: "float"
+    """Maximal aggregated download throughput (bytes/sec). -1 disables download throttling."""
+    uploadThroughput: "float"
+    """Maximal aggregated upload throughput (bytes/sec).  -1 disables upload throttling."""
+    connectionType: "NotRequired[ConnectionType]"
+    """Connection type if known."""
+    packetLoss: "NotRequired[float]"
+    """WebRTC packet loss (percent, 0-100). 0 disables packet loss emulation, 100 drops all the packets."""
+    packetQueueLength: "NotRequired[int]"
+    """WebRTC packet queue length (packet). 0 removes any queue length limitations."""
+    packetReordering: "NotRequired[bool]"
+    """WebRTC packetReordering feature."""
+
+
+
+class BlockPattern(TypedDict):
+    urlPattern: "str"
+    """URL pattern to match. Patterns use the URLPattern constructor string syntax
+(https://urlpattern.spec.whatwg.org/) and must be absolute. Example: `*://*:*/*.css`."""
+    block: "bool"
+    """Whether or not to block the pattern. If false, a matching request will not be blocked even if it matches a later
+`BlockPattern`."""
+
+
+
 DirectSocketDnsQueryType = Literal["ipv4", "ipv6"]
 
 
@@ -750,6 +791,10 @@ class DirectUDPSocketOptions(TypedDict, total=False):
     """Expected to be unsigned integer."""
     receiveBufferSize: "float"
     """Expected to be unsigned integer."""
+    multicastLoopback: "bool"
+    multicastTimeToLive: "int"
+    """Unsigned int 8."""
+    multicastAllowAddressSharing: "bool"
 
 
 
@@ -763,11 +808,11 @@ Expected to be unsigned integer."""
 
 
 
-PrivateNetworkRequestPolicy = Literal["Allow", "BlockFromInsecureToMorePrivate", "WarnFromInsecureToMorePrivate", "PreflightBlock", "PreflightWarn", "PermissionBlock", "PermissionWarn"]
+PrivateNetworkRequestPolicy = Literal["Allow", "BlockFromInsecureToMorePrivate", "WarnFromInsecureToMorePrivate", "PermissionBlock", "PermissionWarn"]
 
 
 
-IPAddressSpace = Literal["Loopback", "Private", "Public", "Unknown"]
+IPAddressSpace = Literal["Loopback", "Local", "Public", "Unknown"]
 
 
 
@@ -863,6 +908,134 @@ class ReportingApiEndpoint(TypedDict):
     """The URL of the endpoint to which reports may be delivered."""
     groupName: "str"
     """Name of the endpoint group."""
+
+
+
+class DeviceBoundSessionKey(TypedDict):
+    """Unique identifier for a device bound session."""
+
+    site: "str"
+    """The site the session is set up for."""
+    id: "str"
+    """The id of the session."""
+
+
+
+class DeviceBoundSessionCookieCraving(TypedDict):
+    """A device bound session's cookie craving."""
+
+    name: "str"
+    """The name of the craving."""
+    domain: "str"
+    """The domain of the craving."""
+    path: "str"
+    """The path of the craving."""
+    secure: "bool"
+    """The `Secure` attribute of the craving attributes."""
+    httpOnly: "bool"
+    """The `HttpOnly` attribute of the craving attributes."""
+    sameSite: "NotRequired[CookieSameSite]"
+    """The `SameSite` attribute of the craving attributes."""
+
+
+
+class DeviceBoundSessionUrlRule(TypedDict):
+    """A device bound session's inclusion URL rule."""
+
+    ruleType: "str"
+    """See comments on `net::device_bound_sessions::SessionInclusionRules::UrlRule::rule_type`."""
+    hostPattern: "str"
+    """See comments on `net::device_bound_sessions::SessionInclusionRules::UrlRule::host_pattern`."""
+    pathPrefix: "str"
+    """See comments on `net::device_bound_sessions::SessionInclusionRules::UrlRule::path_prefix`."""
+
+
+
+class DeviceBoundSessionInclusionRules(TypedDict):
+    """A device bound session's inclusion rules."""
+
+    origin: "str"
+    """See comments on `net::device_bound_sessions::SessionInclusionRules::origin_`."""
+    includeSite: "bool"
+    """Whether the whole site is included. See comments on
+`net::device_bound_sessions::SessionInclusionRules::include_site_` for more
+details; this boolean is true if that value is populated."""
+    urlRules: "List[DeviceBoundSessionUrlRule]"
+    """See comments on `net::device_bound_sessions::SessionInclusionRules::url_rules_`."""
+
+
+
+class DeviceBoundSession(TypedDict):
+    """A device bound session."""
+
+    key: "DeviceBoundSessionKey"
+    """The site and session ID of the session."""
+    refreshUrl: "str"
+    """See comments on `net::device_bound_sessions::Session::refresh_url_`."""
+    inclusionRules: "DeviceBoundSessionInclusionRules"
+    """See comments on `net::device_bound_sessions::Session::inclusion_rules_`."""
+    cookieCravings: "List[DeviceBoundSessionCookieCraving]"
+    """See comments on `net::device_bound_sessions::Session::cookie_cravings_`."""
+    expiryDate: "TimeSinceEpoch"
+    """See comments on `net::device_bound_sessions::Session::expiry_date_`."""
+    cachedChallenge: "NotRequired[str]"
+    """See comments on `net::device_bound_sessions::Session::cached_challenge__`."""
+    allowedRefreshInitiators: "List[str]"
+    """See comments on `net::device_bound_sessions::Session::allowed_refresh_initiators_`."""
+
+
+
+DeviceBoundSessionEventId = str
+"""A unique identifier for a device bound session event."""
+
+
+
+DeviceBoundSessionFetchResult = Literal["Success", "KeyError", "SigningError", "ServerRequestedTermination", "InvalidSessionId", "InvalidChallenge", "TooManyChallenges", "InvalidFetcherUrl", "InvalidRefreshUrl", "TransientHttpError", "ScopeOriginSameSiteMismatch", "RefreshUrlSameSiteMismatch", "MismatchedSessionId", "MissingScope", "NoCredentials", "SubdomainRegistrationWellKnownUnavailable", "SubdomainRegistrationUnauthorized", "SubdomainRegistrationWellKnownMalformed", "SessionProviderWellKnownUnavailable", "RelyingPartyWellKnownUnavailable", "FederatedKeyThumbprintMismatch", "InvalidFederatedSessionUrl", "InvalidFederatedKey", "TooManyRelyingOriginLabels", "BoundCookieSetForbidden", "NetError", "ProxyError", "EmptySessionConfig", "InvalidCredentialsConfig", "InvalidCredentialsType", "InvalidCredentialsEmptyName", "InvalidCredentialsCookie", "PersistentHttpError", "RegistrationAttemptedChallenge", "InvalidScopeOrigin", "ScopeOriginContainsPath", "RefreshInitiatorNotString", "RefreshInitiatorInvalidHostPattern", "InvalidScopeSpecification", "MissingScopeSpecificationType", "EmptyScopeSpecificationDomain", "EmptyScopeSpecificationPath", "InvalidScopeSpecificationType", "InvalidScopeIncludeSite", "MissingScopeIncludeSite", "FederatedNotAuthorizedByProvider", "FederatedNotAuthorizedByRelyingParty", "SessionProviderWellKnownMalformed", "SessionProviderWellKnownHasProviderOrigin", "RelyingPartyWellKnownMalformed", "RelyingPartyWellKnownHasRelyingOrigins", "InvalidFederatedSessionProviderSessionMissing", "InvalidFederatedSessionWrongProviderOrigin", "InvalidCredentialsCookieCreationTime", "InvalidCredentialsCookieName", "InvalidCredentialsCookieParsing", "InvalidCredentialsCookieUnpermittedAttribute", "InvalidCredentialsCookieInvalidDomain", "InvalidCredentialsCookiePrefix", "InvalidScopeRulePath", "InvalidScopeRuleHostPattern", "ScopeRuleOriginScopedHostPatternMismatch", "ScopeRuleSiteScopedHostPatternMismatch", "SigningQuotaExceeded", "InvalidConfigJson", "InvalidFederatedSessionProviderFailedToRestoreKey", "FailedToUnwrapKey", "SessionDeletedDuringRefresh"]
+"""A fetch result for a device bound session creation or refresh."""
+
+
+
+class CreationEventDetails(TypedDict):
+    """Session event details specific to creation."""
+
+    fetchResult: "DeviceBoundSessionFetchResult"
+    """The result of the fetch attempt."""
+    newSession: "NotRequired[DeviceBoundSession]"
+    """The session if there was a newly created session. This is populated for
+all successful creation events."""
+
+
+
+class RefreshEventDetails(TypedDict):
+    """Session event details specific to refresh."""
+
+    refreshResult: "str"
+    """The result of a refresh."""
+    fetchResult: "NotRequired[DeviceBoundSessionFetchResult]"
+    """If there was a fetch attempt, the result of that."""
+    newSession: "NotRequired[DeviceBoundSession]"
+    """The session display if there was a newly created session. This is populated
+for any refresh event that modifies the session config."""
+    wasFullyProactiveRefresh: "bool"
+    """See comments on `net::device_bound_sessions::RefreshEventResult::was_fully_proactive_refresh`."""
+
+
+
+class TerminationEventDetails(TypedDict):
+    """Session event details specific to termination."""
+
+    deletionReason: "str"
+    """The reason for a session being deleted."""
+
+
+
+class ChallengeEventDetails(TypedDict):
+    """Session event details specific to challenges."""
+
+    challengeResult: "str"
+    """The result of a challenge."""
+    challenge: "str"
+    """The challenge set."""
 
 
 

@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ...client import CDPClient
     from .commands import GetCategoriesReturns
+    from .commands import GetTrackEventDescriptorReturns
     from .commands import RecordClockSyncMarkerParameters
     from .commands import RequestMemoryDumpParameters
     from .commands import RequestMemoryDumpReturns
@@ -42,6 +43,18 @@ class TracingClient:
         """Gets supported tracing categories."""
         return cast("GetCategoriesReturns", await self._client.send_raw(
             method="Tracing.getCategories",
+            params=params,
+            session_id=session_id,
+        ))
+
+    async def getTrackEventDescriptor(
+        self,
+        params: None = None,
+        session_id: Optional[str] = None,
+    ) -> "GetTrackEventDescriptorReturns":
+        """Return a descriptor for all available tracing categories."""
+        return cast("GetTrackEventDescriptorReturns", await self._client.send_raw(
+            method="Tracing.getTrackEventDescriptor",
             params=params,
             session_id=session_id,
         ))

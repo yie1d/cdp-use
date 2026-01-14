@@ -4,8 +4,7 @@
 
 """CDP Page Domain Commands"""
 
-from typing import List
-from typing_extensions import NotRequired, TypedDict
+from typing import List, NotRequired, TypedDict
 
 from typing import TYPE_CHECKING
 
@@ -266,6 +265,8 @@ class NavigateReturns(TypedDict):
 as the previously committed loaderId would not change."""
     errorText: "str"
     """User friendly error message, present if and only if navigation has failed."""
+    isDownload: "bool"
+    """Whether the navigation resulted in a download."""
 
 
 
@@ -619,3 +620,16 @@ class SetPrerenderingAllowedParameters(TypedDict):
     isAllowed: "bool"
 
 
+
+
+
+class GetAnnotatedPageContentParameters(TypedDict, total=False):
+    includeActionableInformation: "bool"
+    """Whether to include actionable information. Defaults to true."""
+
+
+class GetAnnotatedPageContentReturns(TypedDict):
+    content: "str"
+    """The annotated page content as a base64 encoded protobuf.
+The format is defined by the `AnnotatedPageContent` message in
+components/optimization_guide/proto/features/common_quality_data.proto (Encoded as a base64 string when passed over JSON)"""

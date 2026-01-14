@@ -4,7 +4,7 @@
 
 """CDP Schema Domain Types"""
 
-from typing_extensions import TypedDict
+from typing import TypedDict
 
 class Domain(TypedDict):
     """Description of the protocol domain."""

@@ -4,9 +4,8 @@
 
 """CDP Accessibility Domain Types"""
 
-from typing import Any, List
-from typing_extensions import Literal
-from typing_extensions import NotRequired, TypedDict
+from typing import Any, List, NotRequired, TypedDict
+from typing import Literal
 
 from typing import TYPE_CHECKING
 
@@ -90,13 +89,14 @@ class AXValue(TypedDict):
 
 
 
-AXPropertyName = Literal["actions", "busy", "disabled", "editable", "focusable", "focused", "hidden", "hiddenRoot", "invalid", "keyshortcuts", "settable", "roledescription", "live", "atomic", "relevant", "root", "autocomplete", "hasPopup", "level", "multiselectable", "orientation", "multiline", "readonly", "required", "valuemin", "valuemax", "valuetext", "checked", "expanded", "modal", "pressed", "selected", "activedescendant", "controls", "describedby", "details", "errormessage", "flowto", "labelledby", "owns", "url"]
+AXPropertyName = Literal["actions", "busy", "disabled", "editable", "focusable", "focused", "hidden", "hiddenRoot", "invalid", "keyshortcuts", "settable", "roledescription", "live", "atomic", "relevant", "root", "autocomplete", "hasPopup", "level", "multiselectable", "orientation", "multiline", "readonly", "required", "valuemin", "valuemax", "valuetext", "checked", "expanded", "modal", "pressed", "selected", "activedescendant", "controls", "describedby", "details", "errormessage", "flowto", "labelledby", "owns", "url", "activeFullscreenElement", "activeModalDialog", "activeAriaModalDialog", "ariaHiddenElement", "ariaHiddenSubtree", "emptyAlt", "emptyText", "inertElement", "inertSubtree", "labelContainer", "labelFor", "notRendered", "notVisible", "presentationalRole", "probablyPresentational", "inactiveCarouselTabContent", "uninteresting"]
 """Values of AXProperty name:
 - from 'busy' to 'roledescription': states which apply to every AX node
 - from 'live' to 'root': attributes which apply to nodes in live regions
 - from 'autocomplete' to 'valuetext': attributes which apply to widgets
 - from 'checked' to 'selected': states which apply to widgets
-- from 'activedescendant' to 'owns' - relationships between elements other than parent/child/sibling."""
+- from 'activedescendant' to 'owns': relationships between elements other than parent/child/sibling
+- from 'activeFullscreenElement' to 'uninteresting': reasons why this noode is hidden"""
 
 
 

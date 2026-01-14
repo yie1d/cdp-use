@@ -26,6 +26,8 @@ if TYPE_CHECKING:
     from .commands import GenerateTestReportParameters
     from .commands import GetAdScriptAncestryParameters
     from .commands import GetAdScriptAncestryReturns
+    from .commands import GetAnnotatedPageContentParameters
+    from .commands import GetAnnotatedPageContentReturns
     from .commands import GetAppIdReturns
     from .commands import GetAppManifestParameters
     from .commands import GetAppManifestReturns
@@ -819,6 +821,19 @@ for more details.
 TODO(https://crbug.com/1440085): Remove this once Puppeteer supports tab targets."""
         return cast("Dict[str, Any]", await self._client.send_raw(
             method="Page.setPrerenderingAllowed",
+            params=params,
+            session_id=session_id,
+        ))
+
+    async def getAnnotatedPageContent(
+        self,
+        params: Optional["GetAnnotatedPageContentParameters"] = None,
+        session_id: Optional[str] = None,
+    ) -> "GetAnnotatedPageContentReturns":
+        """Get the annotated page content for the main frame.
+This is an experimental command that is subject to change."""
+        return cast("GetAnnotatedPageContentReturns", await self._client.send_raw(
+            method="Page.getAnnotatedPageContent",
             params=params,
             session_id=session_id,
         ))

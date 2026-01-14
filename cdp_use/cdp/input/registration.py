@@ -4,7 +4,8 @@
 
 """CDP Input Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,16 +16,18 @@ if TYPE_CHECKING:
 class InputRegistration:
     """Event registration interface for Input domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Input"
+        self._mode = mode  # 'register' or 'unregister'
 
     def dragIntercepted(
         self,
-        callback: Callable[['DragInterceptedEvent', Optional[str]], None],
+        callback: Union[Callable[['DragInterceptedEvent', Optional[str]], None], Callable[['DragInterceptedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for dragIntercepted events.
+        Register or unregister a callback for dragIntercepted events.
         
         Emitted only when `Input.setInterceptDrags` is enabled. Use this data with `Input.dispatchDragEvent` to
 restore normal drag and drop behavior.
@@ -32,6 +35,15 @@ restore normal drag and drop behavior.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Input.dragIntercepted", callback)
+        if self._mode == 'register':
+            self._registry.register("Input.dragIntercepted", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Input.dragIntercepted", callback)
 

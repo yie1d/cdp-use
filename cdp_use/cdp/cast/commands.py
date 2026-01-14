@@ -4,7 +4,7 @@
 
 """CDP Cast Domain Commands"""
 
-from typing_extensions import TypedDict
+from typing import TypedDict
 
 class EnableParameters(TypedDict, total=False):
     presentationUrl: "str"

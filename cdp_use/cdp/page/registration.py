@@ -4,7 +4,8 @@
 
 """CDP Page Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -44,89 +45,141 @@ if TYPE_CHECKING:
 class PageRegistration:
     """Event registration interface for Page domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Page"
+        self._mode = mode  # 'register' or 'unregister'
 
     def domContentEventFired(
         self,
-        callback: Callable[['DomContentEventFiredEvent', Optional[str]], None],
+        callback: Union[Callable[['DomContentEventFiredEvent', Optional[str]], None], Callable[['DomContentEventFiredEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for domContentEventFired events.
+        Register or unregister a callback for domContentEventFired events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.domContentEventFired", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.domContentEventFired", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.domContentEventFired", callback)
 
     def fileChooserOpened(
         self,
-        callback: Callable[['FileChooserOpenedEvent', Optional[str]], None],
+        callback: Union[Callable[['FileChooserOpenedEvent', Optional[str]], None], Callable[['FileChooserOpenedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for fileChooserOpened events.
+        Register or unregister a callback for fileChooserOpened events.
         
         Emitted only when `page.interceptFileChooser` is enabled.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.fileChooserOpened", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.fileChooserOpened", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.fileChooserOpened", callback)
 
     def frameAttached(
         self,
-        callback: Callable[['FrameAttachedEvent', Optional[str]], None],
+        callback: Union[Callable[['FrameAttachedEvent', Optional[str]], None], Callable[['FrameAttachedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for frameAttached events.
+        Register or unregister a callback for frameAttached events.
         
         Fired when frame has been attached to its parent.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.frameAttached", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.frameAttached", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.frameAttached", callback)
 
     def frameClearedScheduledNavigation(
         self,
-        callback: Callable[['FrameClearedScheduledNavigationEvent', Optional[str]], None],
+        callback: Union[Callable[['FrameClearedScheduledNavigationEvent', Optional[str]], None], Callable[['FrameClearedScheduledNavigationEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for frameClearedScheduledNavigation events.
+        Register or unregister a callback for frameClearedScheduledNavigation events.
         
         Fired when frame no longer has a scheduled navigation.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.frameClearedScheduledNavigation", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.frameClearedScheduledNavigation", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.frameClearedScheduledNavigation", callback)
 
     def frameDetached(
         self,
-        callback: Callable[['FrameDetachedEvent', Optional[str]], None],
+        callback: Union[Callable[['FrameDetachedEvent', Optional[str]], None], Callable[['FrameDetachedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for frameDetached events.
+        Register or unregister a callback for frameDetached events.
         
         Fired when frame has been detached from its parent.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.frameDetached", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.frameDetached", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.frameDetached", callback)
 
     def frameSubtreeWillBeDetached(
         self,
-        callback: Callable[['FrameSubtreeWillBeDetachedEvent', Optional[str]], None],
+        callback: Union[Callable[['FrameSubtreeWillBeDetachedEvent', Optional[str]], None], Callable[['FrameSubtreeWillBeDetachedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for frameSubtreeWillBeDetached events.
+        Register or unregister a callback for frameSubtreeWillBeDetached events.
         
         Fired before frame subtree is detached. Emitted before any frame of the
 subtree is actually detached.
@@ -134,58 +187,98 @@ subtree is actually detached.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.frameSubtreeWillBeDetached", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.frameSubtreeWillBeDetached", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.frameSubtreeWillBeDetached", callback)
 
     def frameNavigated(
         self,
-        callback: Callable[['FrameNavigatedEvent', Optional[str]], None],
+        callback: Union[Callable[['FrameNavigatedEvent', Optional[str]], None], Callable[['FrameNavigatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for frameNavigated events.
+        Register or unregister a callback for frameNavigated events.
         
         Fired once navigation of the frame has completed. Frame is now associated with the new loader.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.frameNavigated", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.frameNavigated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.frameNavigated", callback)
 
     def documentOpened(
         self,
-        callback: Callable[['DocumentOpenedEvent', Optional[str]], None],
+        callback: Union[Callable[['DocumentOpenedEvent', Optional[str]], None], Callable[['DocumentOpenedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for documentOpened events.
+        Register or unregister a callback for documentOpened events.
         
         Fired when opening document to write to.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.documentOpened", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.documentOpened", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.documentOpened", callback)
 
     def frameResized(
         self,
-        callback: Callable[['FrameResizedEvent', Optional[str]], None],
+        callback: Union[Callable[['FrameResizedEvent', Optional[str]], None], Callable[['FrameResizedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for frameResized events.
+        Register or unregister a callback for frameResized events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.frameResized", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.frameResized", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.frameResized", callback)
 
     def frameStartedNavigating(
         self,
-        callback: Callable[['FrameStartedNavigatingEvent', Optional[str]], None],
+        callback: Union[Callable[['FrameStartedNavigatingEvent', Optional[str]], None], Callable[['FrameStartedNavigatingEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for frameStartedNavigating events.
+        Register or unregister a callback for frameStartedNavigating events.
         
         Fired when a navigation starts. This event is fired for both
 renderer-initiated and browser-initiated navigations. For renderer-initiated
@@ -198,15 +291,25 @@ frameset).
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.frameStartedNavigating", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.frameStartedNavigating", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.frameStartedNavigating", callback)
 
     def frameRequestedNavigation(
         self,
-        callback: Callable[['FrameRequestedNavigationEvent', Optional[str]], None],
+        callback: Union[Callable[['FrameRequestedNavigationEvent', Optional[str]], None], Callable[['FrameRequestedNavigationEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for frameRequestedNavigation events.
+        Register or unregister a callback for frameRequestedNavigation events.
         
         Fired when a renderer-initiated navigation is requested.
 Navigation may still be cancelled after the event is issued.
@@ -214,60 +317,100 @@ Navigation may still be cancelled after the event is issued.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.frameRequestedNavigation", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.frameRequestedNavigation", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.frameRequestedNavigation", callback)
 
     def frameScheduledNavigation(
         self,
-        callback: Callable[['FrameScheduledNavigationEvent', Optional[str]], None],
+        callback: Union[Callable[['FrameScheduledNavigationEvent', Optional[str]], None], Callable[['FrameScheduledNavigationEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for frameScheduledNavigation events.
+        Register or unregister a callback for frameScheduledNavigation events.
         
         Fired when frame schedules a potential navigation.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.frameScheduledNavigation", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.frameScheduledNavigation", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.frameScheduledNavigation", callback)
 
     def frameStartedLoading(
         self,
-        callback: Callable[['FrameStartedLoadingEvent', Optional[str]], None],
+        callback: Union[Callable[['FrameStartedLoadingEvent', Optional[str]], None], Callable[['FrameStartedLoadingEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for frameStartedLoading events.
+        Register or unregister a callback for frameStartedLoading events.
         
         Fired when frame has started loading.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.frameStartedLoading", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.frameStartedLoading", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.frameStartedLoading", callback)
 
     def frameStoppedLoading(
         self,
-        callback: Callable[['FrameStoppedLoadingEvent', Optional[str]], None],
+        callback: Union[Callable[['FrameStoppedLoadingEvent', Optional[str]], None], Callable[['FrameStoppedLoadingEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for frameStoppedLoading events.
+        Register or unregister a callback for frameStoppedLoading events.
         
         Fired when frame has stopped loading.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.frameStoppedLoading", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.frameStoppedLoading", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.frameStoppedLoading", callback)
 
     def downloadWillBegin(
         self,
-        callback: Callable[['DownloadWillBeginEvent', Optional[str]], None],
+        callback: Union[Callable[['DownloadWillBeginEvent', Optional[str]], None], Callable[['DownloadWillBeginEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for downloadWillBegin events.
+        Register or unregister a callback for downloadWillBegin events.
         
         Fired when page is about to start a download.
 Deprecated. Use Browser.downloadWillBegin instead.
@@ -275,15 +418,25 @@ Deprecated. Use Browser.downloadWillBegin instead.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.downloadWillBegin", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.downloadWillBegin", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.downloadWillBegin", callback)
 
     def downloadProgress(
         self,
-        callback: Callable[['DownloadProgressEvent', Optional[str]], None],
+        callback: Union[Callable[['DownloadProgressEvent', Optional[str]], None], Callable[['DownloadProgressEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for downloadProgress events.
+        Register or unregister a callback for downloadProgress events.
         
         Fired when download makes progress. Last call has |done| == true.
 Deprecated. Use Browser.downloadProgress instead.
@@ -291,45 +444,75 @@ Deprecated. Use Browser.downloadProgress instead.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.downloadProgress", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.downloadProgress", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.downloadProgress", callback)
 
     def interstitialHidden(
         self,
-        callback: Callable[['InterstitialHiddenEvent', Optional[str]], None],
+        callback: Union[Callable[['InterstitialHiddenEvent', Optional[str]], None], Callable[['InterstitialHiddenEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for interstitialHidden events.
+        Register or unregister a callback for interstitialHidden events.
         
         Fired when interstitial page was hidden
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.interstitialHidden", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.interstitialHidden", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.interstitialHidden", callback)
 
     def interstitialShown(
         self,
-        callback: Callable[['InterstitialShownEvent', Optional[str]], None],
+        callback: Union[Callable[['InterstitialShownEvent', Optional[str]], None], Callable[['InterstitialShownEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for interstitialShown events.
+        Register or unregister a callback for interstitialShown events.
         
         Fired when interstitial page was shown
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.interstitialShown", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.interstitialShown", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.interstitialShown", callback)
 
     def javascriptDialogClosed(
         self,
-        callback: Callable[['JavascriptDialogClosedEvent', Optional[str]], None],
+        callback: Union[Callable[['JavascriptDialogClosedEvent', Optional[str]], None], Callable[['JavascriptDialogClosedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for javascriptDialogClosed events.
+        Register or unregister a callback for javascriptDialogClosed events.
         
         Fired when a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload) has been
 closed.
@@ -337,15 +520,25 @@ closed.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.javascriptDialogClosed", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.javascriptDialogClosed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.javascriptDialogClosed", callback)
 
     def javascriptDialogOpening(
         self,
-        callback: Callable[['JavascriptDialogOpeningEvent', Optional[str]], None],
+        callback: Union[Callable[['JavascriptDialogOpeningEvent', Optional[str]], None], Callable[['JavascriptDialogOpeningEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for javascriptDialogOpening events.
+        Register or unregister a callback for javascriptDialogOpening events.
         
         Fired when a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload) is about to
 open.
@@ -353,15 +546,25 @@ open.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.javascriptDialogOpening", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.javascriptDialogOpening", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.javascriptDialogOpening", callback)
 
     def lifecycleEvent(
         self,
-        callback: Callable[['LifecycleEventEvent', Optional[str]], None],
+        callback: Union[Callable[['LifecycleEventEvent', Optional[str]], None], Callable[['LifecycleEventEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for lifecycleEvent events.
+        Register or unregister a callback for lifecycleEvent events.
         
         Fired for lifecycle events (navigation, load, paint, etc) in the current
 target (including local frames).
@@ -369,15 +572,25 @@ target (including local frames).
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.lifecycleEvent", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.lifecycleEvent", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.lifecycleEvent", callback)
 
     def backForwardCacheNotUsed(
         self,
-        callback: Callable[['BackForwardCacheNotUsedEvent', Optional[str]], None],
+        callback: Union[Callable[['BackForwardCacheNotUsedEvent', Optional[str]], None], Callable[['BackForwardCacheNotUsedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for backForwardCacheNotUsed events.
+        Register or unregister a callback for backForwardCacheNotUsed events.
         
         Fired for failed bfcache history navigations if BackForwardCache feature is enabled. Do
 not assume any ordering with the Page.frameNavigated event. This event is fired only for
@@ -387,73 +600,123 @@ when bfcache navigation fails.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.backForwardCacheNotUsed", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.backForwardCacheNotUsed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.backForwardCacheNotUsed", callback)
 
     def loadEventFired(
         self,
-        callback: Callable[['LoadEventFiredEvent', Optional[str]], None],
+        callback: Union[Callable[['LoadEventFiredEvent', Optional[str]], None], Callable[['LoadEventFiredEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for loadEventFired events.
+        Register or unregister a callback for loadEventFired events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.loadEventFired", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.loadEventFired", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.loadEventFired", callback)
 
     def navigatedWithinDocument(
         self,
-        callback: Callable[['NavigatedWithinDocumentEvent', Optional[str]], None],
+        callback: Union[Callable[['NavigatedWithinDocumentEvent', Optional[str]], None], Callable[['NavigatedWithinDocumentEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for navigatedWithinDocument events.
+        Register or unregister a callback for navigatedWithinDocument events.
         
         Fired when same-document navigation happens, e.g. due to history API usage or anchor navigation.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.navigatedWithinDocument", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.navigatedWithinDocument", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.navigatedWithinDocument", callback)
 
     def screencastFrame(
         self,
-        callback: Callable[['ScreencastFrameEvent', Optional[str]], None],
+        callback: Union[Callable[['ScreencastFrameEvent', Optional[str]], None], Callable[['ScreencastFrameEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for screencastFrame events.
+        Register or unregister a callback for screencastFrame events.
         
         Compressed image data requested by the `startScreencast`.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.screencastFrame", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.screencastFrame", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.screencastFrame", callback)
 
     def screencastVisibilityChanged(
         self,
-        callback: Callable[['ScreencastVisibilityChangedEvent', Optional[str]], None],
+        callback: Union[Callable[['ScreencastVisibilityChangedEvent', Optional[str]], None], Callable[['ScreencastVisibilityChangedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for screencastVisibilityChanged events.
+        Register or unregister a callback for screencastVisibilityChanged events.
         
         Fired when the page with currently enabled screencast was shown or hidden `.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.screencastVisibilityChanged", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.screencastVisibilityChanged", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.screencastVisibilityChanged", callback)
 
     def windowOpen(
         self,
-        callback: Callable[['WindowOpenEvent', Optional[str]], None],
+        callback: Union[Callable[['WindowOpenEvent', Optional[str]], None], Callable[['WindowOpenEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for windowOpen events.
+        Register or unregister a callback for windowOpen events.
         
         Fired when a new window is going to be opened, via window.open(), link click, form submission,
 etc.
@@ -461,22 +724,40 @@ etc.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.windowOpen", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.windowOpen", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.windowOpen", callback)
 
     def compilationCacheProduced(
         self,
-        callback: Callable[['CompilationCacheProducedEvent', Optional[str]], None],
+        callback: Union[Callable[['CompilationCacheProducedEvent', Optional[str]], None], Callable[['CompilationCacheProducedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for compilationCacheProduced events.
+        Register or unregister a callback for compilationCacheProduced events.
         
-        Issued for every compilation cache generated. Is only available
-if Page.setGenerateCompilationCache is enabled.
+        Issued for every compilation cache generated.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Page.compilationCacheProduced", callback)
+        if self._mode == 'register':
+            self._registry.register("Page.compilationCacheProduced", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Page.compilationCacheProduced", callback)
 

@@ -4,7 +4,8 @@
 
 """CDP WebAuthn Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,31 +16,43 @@ if TYPE_CHECKING:
 class WebAuthnRegistration:
     """Event registration interface for WebAuthn domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "WebAuthn"
+        self._mode = mode  # 'register' or 'unregister'
 
     def credentialAdded(
         self,
-        callback: Callable[['CredentialAddedEvent', Optional[str]], None],
+        callback: Union[Callable[['CredentialAddedEvent', Optional[str]], None], Callable[['CredentialAddedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for credentialAdded events.
+        Register or unregister a callback for credentialAdded events.
         
         Triggered when a credential is added to an authenticator.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("WebAuthn.credentialAdded", callback)
+        if self._mode == 'register':
+            self._registry.register("WebAuthn.credentialAdded", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("WebAuthn.credentialAdded", callback)
 
     def credentialDeleted(
         self,
-        callback: Callable[['CredentialDeletedEvent', Optional[str]], None],
+        callback: Union[Callable[['CredentialDeletedEvent', Optional[str]], None], Callable[['CredentialDeletedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for credentialDeleted events.
+        Register or unregister a callback for credentialDeleted events.
         
         Triggered when a credential is deleted, e.g. through
 PublicKeyCredential.signalUnknownCredential().
@@ -47,15 +60,25 @@ PublicKeyCredential.signalUnknownCredential().
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("WebAuthn.credentialDeleted", callback)
+        if self._mode == 'register':
+            self._registry.register("WebAuthn.credentialDeleted", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("WebAuthn.credentialDeleted", callback)
 
     def credentialUpdated(
         self,
-        callback: Callable[['CredentialUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['CredentialUpdatedEvent', Optional[str]], None], Callable[['CredentialUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for credentialUpdated events.
+        Register or unregister a callback for credentialUpdated events.
         
         Triggered when a credential is updated, e.g. through
 PublicKeyCredential.signalCurrentUserDetails().
@@ -63,21 +86,40 @@ PublicKeyCredential.signalCurrentUserDetails().
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("WebAuthn.credentialUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("WebAuthn.credentialUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("WebAuthn.credentialUpdated", callback)
 
     def credentialAsserted(
         self,
-        callback: Callable[['CredentialAssertedEvent', Optional[str]], None],
+        callback: Union[Callable[['CredentialAssertedEvent', Optional[str]], None], Callable[['CredentialAssertedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for credentialAsserted events.
+        Register or unregister a callback for credentialAsserted events.
         
         Triggered when a credential is used in a webauthn assertion.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("WebAuthn.credentialAsserted", callback)
+        if self._mode == 'register':
+            self._registry.register("WebAuthn.credentialAsserted", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("WebAuthn.credentialAsserted", callback)
 

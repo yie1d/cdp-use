@@ -12,162 +12,163 @@ if TYPE_CHECKING:
 class CDPRegistrationLibrary:
     """Main CDP registration library with domain-specific registration interfaces."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
+        self._mode = mode  # 'register' or 'unregister'
 
         # Console domain registration
         from .console.registration import ConsoleRegistration
-        self.Console = ConsoleRegistration(registry)
+        self.Console = ConsoleRegistration(self._registry, self._mode)
 
         # Debugger domain registration
         from .debugger.registration import DebuggerRegistration
-        self.Debugger = DebuggerRegistration(registry)
+        self.Debugger = DebuggerRegistration(self._registry, self._mode)
 
         # HeapProfiler domain registration
         from .heapprofiler.registration import HeapProfilerRegistration
-        self.HeapProfiler = HeapProfilerRegistration(registry)
+        self.HeapProfiler = HeapProfilerRegistration(self._registry, self._mode)
 
         # Profiler domain registration
         from .profiler.registration import ProfilerRegistration
-        self.Profiler = ProfilerRegistration(registry)
+        self.Profiler = ProfilerRegistration(self._registry, self._mode)
 
         # Runtime domain registration
         from .runtime.registration import RuntimeRegistration
-        self.Runtime = RuntimeRegistration(registry)
+        self.Runtime = RuntimeRegistration(self._registry, self._mode)
 
         # Accessibility domain registration
         from .accessibility.registration import AccessibilityRegistration
-        self.Accessibility = AccessibilityRegistration(registry)
+        self.Accessibility = AccessibilityRegistration(self._registry, self._mode)
 
         # Animation domain registration
         from .animation.registration import AnimationRegistration
-        self.Animation = AnimationRegistration(registry)
+        self.Animation = AnimationRegistration(self._registry, self._mode)
 
         # Audits domain registration
         from .audits.registration import AuditsRegistration
-        self.Audits = AuditsRegistration(registry)
+        self.Audits = AuditsRegistration(self._registry, self._mode)
 
         # Autofill domain registration
         from .autofill.registration import AutofillRegistration
-        self.Autofill = AutofillRegistration(registry)
+        self.Autofill = AutofillRegistration(self._registry, self._mode)
 
         # BackgroundService domain registration
         from .backgroundservice.registration import BackgroundServiceRegistration
-        self.BackgroundService = BackgroundServiceRegistration(registry)
-
-        # Browser domain registration
-        from .browser.registration import BrowserRegistration
-        self.Browser = BrowserRegistration(registry)
-
-        # CSS domain registration
-        from .css.registration import CSSRegistration
-        self.CSS = CSSRegistration(registry)
-
-        # Cast domain registration
-        from .cast.registration import CastRegistration
-        self.Cast = CastRegistration(registry)
-
-        # DOM domain registration
-        from .dom.registration import DOMRegistration
-        self.DOM = DOMRegistration(registry)
-
-        # DOMStorage domain registration
-        from .domstorage.registration import DOMStorageRegistration
-        self.DOMStorage = DOMStorageRegistration(registry)
-
-        # Emulation domain registration
-        from .emulation.registration import EmulationRegistration
-        self.Emulation = EmulationRegistration(registry)
-
-        # Input domain registration
-        from .input.registration import InputRegistration
-        self.Input = InputRegistration(registry)
-
-        # Inspector domain registration
-        from .inspector.registration import InspectorRegistration
-        self.Inspector = InspectorRegistration(registry)
-
-        # LayerTree domain registration
-        from .layertree.registration import LayerTreeRegistration
-        self.LayerTree = LayerTreeRegistration(registry)
-
-        # Log domain registration
-        from .log.registration import LogRegistration
-        self.Log = LogRegistration(registry)
-
-        # Network domain registration
-        from .network.registration import NetworkRegistration
-        self.Network = NetworkRegistration(registry)
-
-        # Overlay domain registration
-        from .overlay.registration import OverlayRegistration
-        self.Overlay = OverlayRegistration(registry)
-
-        # Page domain registration
-        from .page.registration import PageRegistration
-        self.Page = PageRegistration(registry)
-
-        # Performance domain registration
-        from .performance.registration import PerformanceRegistration
-        self.Performance = PerformanceRegistration(registry)
-
-        # PerformanceTimeline domain registration
-        from .performancetimeline.registration import PerformanceTimelineRegistration
-        self.PerformanceTimeline = PerformanceTimelineRegistration(registry)
-
-        # Security domain registration
-        from .security.registration import SecurityRegistration
-        self.Security = SecurityRegistration(registry)
-
-        # ServiceWorker domain registration
-        from .serviceworker.registration import ServiceWorkerRegistration
-        self.ServiceWorker = ServiceWorkerRegistration(registry)
-
-        # Storage domain registration
-        from .storage.registration import StorageRegistration
-        self.Storage = StorageRegistration(registry)
-
-        # Target domain registration
-        from .target.registration import TargetRegistration
-        self.Target = TargetRegistration(registry)
-
-        # Tethering domain registration
-        from .tethering.registration import TetheringRegistration
-        self.Tethering = TetheringRegistration(registry)
-
-        # Tracing domain registration
-        from .tracing.registration import TracingRegistration
-        self.Tracing = TracingRegistration(registry)
-
-        # Fetch domain registration
-        from .fetch.registration import FetchRegistration
-        self.Fetch = FetchRegistration(registry)
-
-        # WebAudio domain registration
-        from .webaudio.registration import WebAudioRegistration
-        self.WebAudio = WebAudioRegistration(registry)
-
-        # WebAuthn domain registration
-        from .webauthn.registration import WebAuthnRegistration
-        self.WebAuthn = WebAuthnRegistration(registry)
-
-        # Media domain registration
-        from .media.registration import MediaRegistration
-        self.Media = MediaRegistration(registry)
-
-        # DeviceAccess domain registration
-        from .deviceaccess.registration import DeviceAccessRegistration
-        self.DeviceAccess = DeviceAccessRegistration(registry)
-
-        # Preload domain registration
-        from .preload.registration import PreloadRegistration
-        self.Preload = PreloadRegistration(registry)
-
-        # FedCm domain registration
-        from .fedcm.registration import FedCmRegistration
-        self.FedCm = FedCmRegistration(registry)
+        self.BackgroundService = BackgroundServiceRegistration(self._registry, self._mode)
 
         # BluetoothEmulation domain registration
         from .bluetoothemulation.registration import BluetoothEmulationRegistration
-        self.BluetoothEmulation = BluetoothEmulationRegistration(registry)
+        self.BluetoothEmulation = BluetoothEmulationRegistration(self._registry, self._mode)
+
+        # Browser domain registration
+        from .browser.registration import BrowserRegistration
+        self.Browser = BrowserRegistration(self._registry, self._mode)
+
+        # CSS domain registration
+        from .css.registration import CSSRegistration
+        self.CSS = CSSRegistration(self._registry, self._mode)
+
+        # Cast domain registration
+        from .cast.registration import CastRegistration
+        self.Cast = CastRegistration(self._registry, self._mode)
+
+        # DOM domain registration
+        from .dom.registration import DOMRegistration
+        self.DOM = DOMRegistration(self._registry, self._mode)
+
+        # DOMStorage domain registration
+        from .domstorage.registration import DOMStorageRegistration
+        self.DOMStorage = DOMStorageRegistration(self._registry, self._mode)
+
+        # DeviceAccess domain registration
+        from .deviceaccess.registration import DeviceAccessRegistration
+        self.DeviceAccess = DeviceAccessRegistration(self._registry, self._mode)
+
+        # Emulation domain registration
+        from .emulation.registration import EmulationRegistration
+        self.Emulation = EmulationRegistration(self._registry, self._mode)
+
+        # FedCm domain registration
+        from .fedcm.registration import FedCmRegistration
+        self.FedCm = FedCmRegistration(self._registry, self._mode)
+
+        # Fetch domain registration
+        from .fetch.registration import FetchRegistration
+        self.Fetch = FetchRegistration(self._registry, self._mode)
+
+        # Input domain registration
+        from .input.registration import InputRegistration
+        self.Input = InputRegistration(self._registry, self._mode)
+
+        # Inspector domain registration
+        from .inspector.registration import InspectorRegistration
+        self.Inspector = InspectorRegistration(self._registry, self._mode)
+
+        # LayerTree domain registration
+        from .layertree.registration import LayerTreeRegistration
+        self.LayerTree = LayerTreeRegistration(self._registry, self._mode)
+
+        # Log domain registration
+        from .log.registration import LogRegistration
+        self.Log = LogRegistration(self._registry, self._mode)
+
+        # Media domain registration
+        from .media.registration import MediaRegistration
+        self.Media = MediaRegistration(self._registry, self._mode)
+
+        # Network domain registration
+        from .network.registration import NetworkRegistration
+        self.Network = NetworkRegistration(self._registry, self._mode)
+
+        # Overlay domain registration
+        from .overlay.registration import OverlayRegistration
+        self.Overlay = OverlayRegistration(self._registry, self._mode)
+
+        # Page domain registration
+        from .page.registration import PageRegistration
+        self.Page = PageRegistration(self._registry, self._mode)
+
+        # Performance domain registration
+        from .performance.registration import PerformanceRegistration
+        self.Performance = PerformanceRegistration(self._registry, self._mode)
+
+        # PerformanceTimeline domain registration
+        from .performancetimeline.registration import PerformanceTimelineRegistration
+        self.PerformanceTimeline = PerformanceTimelineRegistration(self._registry, self._mode)
+
+        # Preload domain registration
+        from .preload.registration import PreloadRegistration
+        self.Preload = PreloadRegistration(self._registry, self._mode)
+
+        # Security domain registration
+        from .security.registration import SecurityRegistration
+        self.Security = SecurityRegistration(self._registry, self._mode)
+
+        # ServiceWorker domain registration
+        from .serviceworker.registration import ServiceWorkerRegistration
+        self.ServiceWorker = ServiceWorkerRegistration(self._registry, self._mode)
+
+        # Storage domain registration
+        from .storage.registration import StorageRegistration
+        self.Storage = StorageRegistration(self._registry, self._mode)
+
+        # Target domain registration
+        from .target.registration import TargetRegistration
+        self.Target = TargetRegistration(self._registry, self._mode)
+
+        # Tethering domain registration
+        from .tethering.registration import TetheringRegistration
+        self.Tethering = TetheringRegistration(self._registry, self._mode)
+
+        # Tracing domain registration
+        from .tracing.registration import TracingRegistration
+        self.Tracing = TracingRegistration(self._registry, self._mode)
+
+        # WebAudio domain registration
+        from .webaudio.registration import WebAudioRegistration
+        self.WebAudio = WebAudioRegistration(self._registry, self._mode)
+
+        # WebAuthn domain registration
+        from .webauthn.registration import WebAuthnRegistration
+        self.WebAuthn = WebAuthnRegistration(self._registry, self._mode)
 

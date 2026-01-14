@@ -4,7 +4,7 @@
 
 """CDP Extensions Domain Types"""
 
-from typing_extensions import Literal
+from typing import Literal
 
 StorageArea = Literal["session", "local", "sync", "managed"]
 """Storage areas."""

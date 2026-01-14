@@ -4,8 +4,7 @@
 
 """CDP Storage Domain Commands"""
 
-from typing import Any, Dict, List
-from typing_extensions import NotRequired, TypedDict
+from typing import Any, Dict, List, NotRequired, TypedDict
 
 from typing import TYPE_CHECKING
 
@@ -27,6 +26,15 @@ class GetStorageKeyForFrameParameters(TypedDict):
 
 
 class GetStorageKeyForFrameReturns(TypedDict):
+    storageKey: "SerializedStorageKey"
+
+
+
+class GetStorageKeyParameters(TypedDict, total=False):
+    frameId: "FrameId"
+
+
+class GetStorageKeyReturns(TypedDict):
     storageKey: "SerializedStorageKey"
 
 

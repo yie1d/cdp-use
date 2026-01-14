@@ -4,7 +4,8 @@
 
 """CDP Security Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,16 +16,18 @@ if TYPE_CHECKING:
 class SecurityRegistration:
     """Event registration interface for Security domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Security"
+        self._mode = mode  # 'register' or 'unregister'
 
     def certificateError(
         self,
-        callback: Callable[['CertificateErrorEvent', Optional[str]], None],
+        callback: Union[Callable[['CertificateErrorEvent', Optional[str]], None], Callable[['CertificateErrorEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for certificateError events.
+        Register or unregister a callback for certificateError events.
         
         There is a certificate error. If overriding certificate errors is enabled, then it should be
 handled with the `handleCertificateError` command. Note: this event does not fire if the
@@ -34,36 +37,65 @@ certificate errors at the same time.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Security.certificateError", callback)
+        if self._mode == 'register':
+            self._registry.register("Security.certificateError", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Security.certificateError", callback)
 
     def visibleSecurityStateChanged(
         self,
-        callback: Callable[['VisibleSecurityStateChangedEvent', Optional[str]], None],
+        callback: Union[Callable[['VisibleSecurityStateChangedEvent', Optional[str]], None], Callable[['VisibleSecurityStateChangedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for visibleSecurityStateChanged events.
+        Register or unregister a callback for visibleSecurityStateChanged events.
         
         The security state of the page changed.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Security.visibleSecurityStateChanged", callback)
+        if self._mode == 'register':
+            self._registry.register("Security.visibleSecurityStateChanged", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Security.visibleSecurityStateChanged", callback)
 
     def securityStateChanged(
         self,
-        callback: Callable[['SecurityStateChangedEvent', Optional[str]], None],
+        callback: Union[Callable[['SecurityStateChangedEvent', Optional[str]], None], Callable[['SecurityStateChangedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for securityStateChanged events.
+        Register or unregister a callback for securityStateChanged events.
         
         The security state of the page changed. No longer being sent.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Security.securityStateChanged", callback)
+        if self._mode == 'register':
+            self._registry.register("Security.securityStateChanged", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Security.securityStateChanged", callback)
 

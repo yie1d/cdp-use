@@ -4,7 +4,7 @@
 
 """CDP Inspector Domain Events"""
 
-from typing_extensions import TypedDict
+from typing import TypedDict
 
 """Fired when remote debugging connection is about to be terminated. Contains detach reason."""
 class DetachedEvent(TypedDict):
@@ -21,4 +21,10 @@ class TargetCrashedEvent(TypedDict):
 
 """Fired when debugging target has reloaded after crash"""
 class TargetReloadedAfterCrashEvent(TypedDict):
+    pass
+
+
+
+"""Fired on worker targets when main worker script and any imported scripts have been evaluated."""
+class WorkerScriptLoadedEvent(TypedDict):
     pass

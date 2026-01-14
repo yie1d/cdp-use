@@ -4,8 +4,7 @@
 
 """CDP Animation Domain Types"""
 
-from typing import List
-from typing_extensions import NotRequired, TypedDict
+from typing import List, NotRequired, TypedDict
 
 from typing import TYPE_CHECKING
 
@@ -74,8 +73,8 @@ class AnimationEffect(TypedDict):
     """`AnimationEffect`'s end delay."""
     iterationStart: "float"
     """`AnimationEffect`'s iteration start."""
-    iterations: "float"
-    """`AnimationEffect`'s iterations."""
+    iterations: "NotRequired[float]"
+    """`AnimationEffect`'s iterations. Omitted if the value is infinite."""
     duration: "float"
     """`AnimationEffect`'s iteration duration.
 Milliseconds for time based animations and

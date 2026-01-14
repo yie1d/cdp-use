@@ -4,7 +4,8 @@
 
 """CDP Emulation Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,22 +16,33 @@ if TYPE_CHECKING:
 class EmulationRegistration:
     """Event registration interface for Emulation domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Emulation"
+        self._mode = mode  # 'register' or 'unregister'
 
     def virtualTimeBudgetExpired(
         self,
-        callback: Callable[['VirtualTimeBudgetExpiredEvent', Optional[str]], None],
+        callback: Union[Callable[['VirtualTimeBudgetExpiredEvent', Optional[str]], None], Callable[['VirtualTimeBudgetExpiredEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for virtualTimeBudgetExpired events.
+        Register or unregister a callback for virtualTimeBudgetExpired events.
         
         Notification sent after the virtual time budget for the current VirtualTimePolicy has run out.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Emulation.virtualTimeBudgetExpired", callback)
+        if self._mode == 'register':
+            self._registry.register("Emulation.virtualTimeBudgetExpired", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Emulation.virtualTimeBudgetExpired", callback)
 

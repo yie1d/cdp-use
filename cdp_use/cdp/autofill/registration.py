@@ -4,7 +4,8 @@
 
 """CDP Autofill Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,22 +16,33 @@ if TYPE_CHECKING:
 class AutofillRegistration:
     """Event registration interface for Autofill domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Autofill"
+        self._mode = mode  # 'register' or 'unregister'
 
     def addressFormFilled(
         self,
-        callback: Callable[['AddressFormFilledEvent', Optional[str]], None],
+        callback: Union[Callable[['AddressFormFilledEvent', Optional[str]], None], Callable[['AddressFormFilledEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for addressFormFilled events.
+        Register or unregister a callback for addressFormFilled events.
         
         Emitted when an address form is filled.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Autofill.addressFormFilled", callback)
+        if self._mode == 'register':
+            self._registry.register("Autofill.addressFormFilled", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Autofill.addressFormFilled", callback)
 

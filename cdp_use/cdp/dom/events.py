@@ -4,8 +4,7 @@
 
 """CDP DOM Domain Events"""
 
-from typing import List
-from typing_extensions import TypedDict
+from typing import List, TypedDict
 
 from typing import TYPE_CHECKING
 
@@ -14,6 +13,7 @@ if TYPE_CHECKING:
     from .types import BackendNode
     from .types import Node
     from .types import NodeId
+    from .types import StyleSheetId
 
 """Fired when `Element`'s attribute is modified."""
 class AttributeModifiedEvent(TypedDict):
@@ -23,6 +23,15 @@ class AttributeModifiedEvent(TypedDict):
     """Attribute name."""
     value: "str"
     """Attribute value."""
+
+
+
+"""Fired when `Element`'s adoptedStyleSheets are modified."""
+class AdoptedStyleSheetsModifiedEvent(TypedDict):
+    nodeId: "NodeId"
+    """Id of the node that has changed."""
+    adoptedStyleSheets: "List[StyleSheetId]"
+    """New adoptedStyleSheets array."""
 
 
 
@@ -116,6 +125,15 @@ class ScrollableFlagUpdatedEvent(TypedDict):
     """The id of the node."""
     isScrollable: "bool"
     """If the node is scrollable."""
+
+
+
+"""Fired when a node's starting styles changes."""
+class AffectedByStartingStylesFlagUpdatedEvent(TypedDict):
+    nodeId: "NodeId"
+    """The id of the node."""
+    affectedByStartingStyles: "bool"
+    """If the node has starting styles."""
 
 
 

@@ -4,9 +4,8 @@
 
 """CDP CSS Domain Types"""
 
-from typing import List
-from typing_extensions import Literal
-from typing_extensions import NotRequired, TypedDict
+from typing import List, NotRequired, TypedDict
+from typing import Literal
 
 from typing import TYPE_CHECKING
 
@@ -15,11 +14,8 @@ if TYPE_CHECKING:
     from ..dom.types import LogicalAxes
     from ..dom.types import PhysicalAxes
     from ..dom.types import PseudoType
+    from ..dom.types import StyleSheetId
     from ..page.types import FrameId
-
-StyleSheetId = str
-
-
 
 StyleSheetOrigin = Literal["injected", "user-agent", "inspector", "regular"]
 """Stylesheet type: "injected" for stylesheets injected via extension, "user-agent" for user-agent
@@ -187,6 +183,8 @@ stylesheet rules) this rule came from."""
     """Parent stylesheet's origin."""
     style: "CSSStyle"
     """Associated style declaration."""
+    originTreeScopeNodeId: "NotRequired[BackendNodeId]"
+    """The BackendNodeId of the DOM node that constitutes the origin tree scope of this rule."""
     media: "NotRequired[List[CSSMedia]]"
     """Media list array (for rules involving media queries). The array enumerates media queries
 starting with the innermost one, going outwards."""
@@ -260,6 +258,14 @@ class CSSComputedStyleProperty(TypedDict):
     """Computed style property name."""
     value: "str"
     """Computed style property value."""
+
+
+
+class ComputedStyleExtraFields(TypedDict):
+    isAppearanceBase: "bool"
+    """Returns whether or not this node is being rendered with base appearance,
+which happens when it has its appearance property set to base/base-select
+or it is in the subtree of an element being rendered with base appearance."""
 
 
 
@@ -371,6 +377,8 @@ available)."""
     """Optional logical axes queried for the container."""
     queriesScrollState: "NotRequired[bool]"
     """true if the query contains scroll-state() queries."""
+    queriesAnchored: "NotRequired[bool]"
+    """true if the query contains anchored() queries."""
 
 
 
@@ -545,16 +553,21 @@ class CSSPropertyRegistration(TypedDict):
 
 
 
-class CSSFontPaletteValuesRule(TypedDict):
-    """CSS font-palette-values rule representation."""
+class CSSAtRule(TypedDict):
+    """CSS generic @rule representation."""
 
+    type: "str"
+    """Type of at-rule."""
+    subsection: "NotRequired[str]"
+    """Subsection of font-feature-values, if this is a subsection."""
+    name: "NotRequired[Value]"
+    """LINT.ThenChange(//third_party/blink/renderer/core/inspector/inspector_style_sheet.cc:FontVariantAlternatesFeatureType,//third_party/blink/renderer/core/inspector/inspector_css_agent.cc:FontVariantAlternatesFeatureType)
+Associated name, if applicable."""
     styleSheetId: "NotRequired[StyleSheetId]"
     """The css style sheet identifier (absent for user agent stylesheet and user-specified
 stylesheet rules) this rule came from."""
     origin: "StyleSheetOrigin"
     """Parent stylesheet's origin."""
-    fontPaletteName: "Value"
-    """Associated font palette name."""
     style: "CSSStyle"
     """Associated style declaration."""
 

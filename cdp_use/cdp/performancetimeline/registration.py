@@ -4,7 +4,8 @@
 
 """CDP PerformanceTimeline Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,22 +16,33 @@ if TYPE_CHECKING:
 class PerformanceTimelineRegistration:
     """Event registration interface for PerformanceTimeline domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "PerformanceTimeline"
+        self._mode = mode  # 'register' or 'unregister'
 
     def timelineEventAdded(
         self,
-        callback: Callable[['TimelineEventAddedEvent', Optional[str]], None],
+        callback: Union[Callable[['TimelineEventAddedEvent', Optional[str]], None], Callable[['TimelineEventAddedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for timelineEventAdded events.
+        Register or unregister a callback for timelineEventAdded events.
         
         Sent when a performance timeline event is added. See reportPerformanceTimeline method.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("PerformanceTimeline.timelineEventAdded", callback)
+        if self._mode == 'register':
+            self._registry.register("PerformanceTimeline.timelineEventAdded", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("PerformanceTimeline.timelineEventAdded", callback)
 

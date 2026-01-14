@@ -4,7 +4,7 @@
 
 """CDP Tethering Domain Commands"""
 
-from typing_extensions import TypedDict
+from typing import TypedDict
 
 class BindParameters(TypedDict):
     port: "int"

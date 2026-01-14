@@ -4,8 +4,7 @@
 
 """CDP Network Domain Events"""
 
-from typing import List
-from typing_extensions import NotRequired, TypedDict
+from typing import List, NotRequired, TypedDict
 
 from typing import TYPE_CHECKING
 
@@ -15,10 +14,14 @@ if TYPE_CHECKING:
     from .types import AuthChallenge
     from .types import BlockedReason
     from .types import BlockedSetCookieWithReason
+    from .types import ChallengeEventDetails
     from .types import ClientSecurityState
     from .types import ConnectTiming
     from .types import CookiePartitionKey
     from .types import CorsErrorStatus
+    from .types import CreationEventDetails
+    from .types import DeviceBoundSession
+    from .types import DeviceBoundSessionEventId
     from .types import DirectTCPSocketOptions
     from .types import DirectUDPMessage
     from .types import DirectUDPSocketOptions
@@ -30,6 +33,8 @@ if TYPE_CHECKING:
     from .types import InterceptionId
     from .types import LoaderId
     from .types import MonotonicTime
+    from .types import RefreshEventDetails
+    from .types import RenderBlockingBehavior
     from .types import ReportingApiEndpoint
     from .types import ReportingApiReport
     from .types import Request
@@ -38,6 +43,7 @@ if TYPE_CHECKING:
     from .types import ResourceType
     from .types import Response
     from .types import SignedExchangeInfo
+    from .types import TerminationEventDetails
     from .types import TimeSinceEpoch
     from .types import TrustTokenOperationType
     from .types import WebSocketFrame
@@ -177,6 +183,8 @@ for the request which was just redirected."""
     """Frame identifier."""
     hasUserGesture: "NotRequired[bool]"
     """Whether the request is initiated by a user gesture. Defaults to false."""
+    renderBlockingBehavior: "NotRequired[RenderBlockingBehavior]"
+    """The render blocking behavior of the request."""
 
 
 
@@ -384,6 +392,18 @@ class DirectTCPSocketChunkReceivedEvent(TypedDict):
 
 
 
+class DirectUDPSocketJoinedMulticastGroupEvent(TypedDict):
+    identifier: "RequestId"
+    IPAddress: "str"
+
+
+
+class DirectUDPSocketLeftMulticastGroupEvent(TypedDict):
+    identifier: "RequestId"
+    IPAddress: "str"
+
+
+
 """Fired upon direct_socket.UDPSocket creation."""
 class DirectUDPSocketCreatedEvent(TypedDict):
     identifier: "RequestId"
@@ -455,6 +475,9 @@ the request and the ones not sent; the latter are distinguished by having blocke
     """The client security state set for the request."""
     siteHasCookieInOtherPartition: "NotRequired[bool]"
     """Whether the site has partitioned cookies stored in a partition different than the current one."""
+    appliedNetworkConditionsId: "NotRequired[str]"
+    """The network conditions id if this request was affected by network conditions configured via
+emulateNetworkConditionsByRule."""
 
 
 
@@ -535,54 +558,6 @@ class PolicyUpdatedEvent(TypedDict):
 
 
 
-"""Fired once when parsing the .wbn file has succeeded.
-The event contains the information about the web bundle contents."""
-class SubresourceWebBundleMetadataReceivedEvent(TypedDict):
-    requestId: "RequestId"
-    """Request identifier. Used to match this information to another event."""
-    urls: "List[str]"
-    """A list of URLs of resources in the subresource Web Bundle."""
-
-
-
-"""Fired once when parsing the .wbn file has failed."""
-class SubresourceWebBundleMetadataErrorEvent(TypedDict):
-    requestId: "RequestId"
-    """Request identifier. Used to match this information to another event."""
-    errorMessage: "str"
-    """Error message"""
-
-
-
-"""Fired when handling requests for resources within a .wbn file.
-Note: this will only be fired for resources that are requested by the webpage."""
-class SubresourceWebBundleInnerResponseParsedEvent(TypedDict):
-    innerRequestId: "RequestId"
-    """Request identifier of the subresource request"""
-    innerRequestURL: "str"
-    """URL of the subresource resource."""
-    bundleRequestId: "NotRequired[RequestId]"
-    """Bundle request identifier. Used to match this information to another event.
-This made be absent in case when the instrumentation was enabled only
-after webbundle was parsed."""
-
-
-
-"""Fired when request for resources within a .wbn file failed."""
-class SubresourceWebBundleInnerResponseErrorEvent(TypedDict):
-    innerRequestId: "RequestId"
-    """Request identifier of the subresource request"""
-    innerRequestURL: "str"
-    """URL of the subresource resource."""
-    errorMessage: "str"
-    """Error message"""
-    bundleRequestId: "NotRequired[RequestId]"
-    """Bundle request identifier. Used to match this information to another event.
-This made be absent in case when the instrumentation was enabled only
-after webbundle was parsed."""
-
-
-
 """Is sent whenever a new report is added.
 And after 'enableReportingApi' for all existing reports."""
 class ReportingApiReportAddedEvent(TypedDict):
@@ -599,3 +574,29 @@ class ReportingApiEndpointsChangedForOriginEvent(TypedDict):
     origin: "str"
     """Origin of the document(s) which configured the endpoints."""
     endpoints: "List[ReportingApiEndpoint]"
+
+
+
+"""Triggered when the initial set of device bound sessions is added."""
+class DeviceBoundSessionsAddedEvent(TypedDict):
+    sessions: "List[DeviceBoundSession]"
+    """The device bound sessions."""
+
+
+
+"""Triggered when a device bound session event occurs."""
+class DeviceBoundSessionEventOccurredEvent(TypedDict):
+    eventId: "DeviceBoundSessionEventId"
+    """A unique identifier for this session event."""
+    site: "str"
+    """The site this session event is associated with."""
+    succeeded: "bool"
+    """Whether this event was considered successful."""
+    sessionId: "NotRequired[str]"
+    """The session ID this event is associated with. May not be populated for
+failed events."""
+    creationEventDetails: "NotRequired[CreationEventDetails]"
+    """The below are the different session event type details. Exactly one is populated."""
+    refreshEventDetails: "NotRequired[RefreshEventDetails]"
+    terminationEventDetails: "NotRequired[TerminationEventDetails]"
+    challengeEventDetails: "NotRequired[ChallengeEventDetails]"

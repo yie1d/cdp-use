@@ -4,7 +4,8 @@
 
 """CDP BluetoothEmulation Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,16 +16,18 @@ if TYPE_CHECKING:
 class BluetoothEmulationRegistration:
     """Event registration interface for BluetoothEmulation domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "BluetoothEmulation"
+        self._mode = mode  # 'register' or 'unregister'
 
     def gattOperationReceived(
         self,
-        callback: Callable[['GattOperationReceivedEvent', Optional[str]], None],
+        callback: Union[Callable[['GattOperationReceivedEvent', Optional[str]], None], Callable[['GattOperationReceivedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for gattOperationReceived events.
+        Register or unregister a callback for gattOperationReceived events.
         
         Event for when a GATT operation of |type| to the peripheral with |address|
 happened.
@@ -32,15 +35,25 @@ happened.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("BluetoothEmulation.gattOperationReceived", callback)
+        if self._mode == 'register':
+            self._registry.register("BluetoothEmulation.gattOperationReceived", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("BluetoothEmulation.gattOperationReceived", callback)
 
     def characteristicOperationReceived(
         self,
-        callback: Callable[['CharacteristicOperationReceivedEvent', Optional[str]], None],
+        callback: Union[Callable[['CharacteristicOperationReceivedEvent', Optional[str]], None], Callable[['CharacteristicOperationReceivedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for characteristicOperationReceived events.
+        Register or unregister a callback for characteristicOperationReceived events.
         
         Event for when a characteristic operation of |type| to the characteristic
 respresented by |characteristicId| happened. |data| and |writeType| is
@@ -49,15 +62,25 @@ expected to exist when |type| is write.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("BluetoothEmulation.characteristicOperationReceived", callback)
+        if self._mode == 'register':
+            self._registry.register("BluetoothEmulation.characteristicOperationReceived", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("BluetoothEmulation.characteristicOperationReceived", callback)
 
     def descriptorOperationReceived(
         self,
-        callback: Callable[['DescriptorOperationReceivedEvent', Optional[str]], None],
+        callback: Union[Callable[['DescriptorOperationReceivedEvent', Optional[str]], None], Callable[['DescriptorOperationReceivedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for descriptorOperationReceived events.
+        Register or unregister a callback for descriptorOperationReceived events.
         
         Event for when a descriptor operation of |type| to the descriptor
 respresented by |descriptorId| happened. |data| is expected to exist when
@@ -66,6 +89,15 @@ respresented by |descriptorId| happened. |data| is expected to exist when
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("BluetoothEmulation.descriptorOperationReceived", callback)
+        if self._mode == 'register':
+            self._registry.register("BluetoothEmulation.descriptorOperationReceived", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("BluetoothEmulation.descriptorOperationReceived", callback)
 

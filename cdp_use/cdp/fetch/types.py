@@ -4,8 +4,8 @@
 
 """CDP Fetch Domain Types"""
 
-from typing_extensions import Literal
-from typing_extensions import NotRequired, TypedDict
+from typing import NotRequired, TypedDict
+from typing import Literal
 
 from typing import TYPE_CHECKING
 

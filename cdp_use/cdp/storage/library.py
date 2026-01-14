@@ -31,6 +31,8 @@ if TYPE_CHECKING:
     from .commands import GetSharedStorageMetadataReturns
     from .commands import GetStorageKeyForFrameParameters
     from .commands import GetStorageKeyForFrameReturns
+    from .commands import GetStorageKeyParameters
+    from .commands import GetStorageKeyReturns
     from .commands import GetTrustTokensReturns
     from .commands import GetUsageAndQuotaParameters
     from .commands import GetUsageAndQuotaReturns
@@ -67,9 +69,23 @@ class StorageClient:
         params: "GetStorageKeyForFrameParameters",
         session_id: Optional[str] = None,
     ) -> "GetStorageKeyForFrameReturns":
-        """Returns a storage key given a frame id."""
+        """Returns a storage key given a frame id.
+Deprecated. Please use Storage.getStorageKey instead."""
         return cast("GetStorageKeyForFrameReturns", await self._client.send_raw(
             method="Storage.getStorageKeyForFrame",
+            params=params,
+            session_id=session_id,
+        ))
+
+    async def getStorageKey(
+        self,
+        params: Optional["GetStorageKeyParameters"] = None,
+        session_id: Optional[str] = None,
+    ) -> "GetStorageKeyReturns":
+        """Returns storage key for the given frame. If no frame ID is provided,
+the storage key of the target executing this command is returned."""
+        return cast("GetStorageKeyReturns", await self._client.send_raw(
+            method="Storage.getStorageKey",
             params=params,
             session_id=session_id,
         ))

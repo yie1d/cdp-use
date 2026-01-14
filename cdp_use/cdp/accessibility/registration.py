@@ -4,7 +4,8 @@
 
 """CDP Accessibility Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,16 +16,18 @@ if TYPE_CHECKING:
 class AccessibilityRegistration:
     """Event registration interface for Accessibility domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Accessibility"
+        self._mode = mode  # 'register' or 'unregister'
 
     def loadComplete(
         self,
-        callback: Callable[['LoadCompleteEvent', Optional[str]], None],
+        callback: Union[Callable[['LoadCompleteEvent', Optional[str]], None], Callable[['LoadCompleteEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for loadComplete events.
+        Register or unregister a callback for loadComplete events.
         
         The loadComplete event mirrors the load complete event sent by the browser to assistive
 technology when the web page has finished loading.
@@ -32,21 +35,40 @@ technology when the web page has finished loading.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Accessibility.loadComplete", callback)
+        if self._mode == 'register':
+            self._registry.register("Accessibility.loadComplete", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Accessibility.loadComplete", callback)
 
     def nodesUpdated(
         self,
-        callback: Callable[['NodesUpdatedEvent', Optional[str]], None],
+        callback: Union[Callable[['NodesUpdatedEvent', Optional[str]], None], Callable[['NodesUpdatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for nodesUpdated events.
+        Register or unregister a callback for nodesUpdated events.
         
         The nodesUpdated event is sent every time a previously requested node has changed the in tree.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Accessibility.nodesUpdated", callback)
+        if self._mode == 'register':
+            self._registry.register("Accessibility.nodesUpdated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Accessibility.nodesUpdated", callback)
 

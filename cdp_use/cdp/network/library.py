@@ -13,11 +13,17 @@ if TYPE_CHECKING:
     from .commands import CanClearBrowserCacheReturns
     from .commands import CanClearBrowserCookiesReturns
     from .commands import CanEmulateNetworkConditionsReturns
+    from .commands import ConfigureDurableMessagesParameters
     from .commands import ContinueInterceptedRequestParameters
     from .commands import DeleteCookiesParameters
+    from .commands import EmulateNetworkConditionsByRuleParameters
+    from .commands import EmulateNetworkConditionsByRuleReturns
     from .commands import EmulateNetworkConditionsParameters
+    from .commands import EnableDeviceBoundSessionsParameters
     from .commands import EnableParameters
     from .commands import EnableReportingApiParameters
+    from .commands import FetchSchemefulSiteParameters
+    from .commands import FetchSchemefulSiteReturns
     from .commands import GetAllCookiesReturns
     from .commands import GetCertificateParameters
     from .commands import GetCertificateReturns
@@ -33,6 +39,7 @@ if TYPE_CHECKING:
     from .commands import GetSecurityIsolationStatusReturns
     from .commands import LoadNetworkResourceParameters
     from .commands import LoadNetworkResourceReturns
+    from .commands import OverrideNetworkStateParameters
     from .commands import ReplayXHRParameters
     from .commands import SearchInResponseBodyParameters
     from .commands import SearchInResponseBodyReturns
@@ -188,9 +195,36 @@ Deprecated, use Fetch.continueRequest, Fetch.fulfillRequest and Fetch.failReques
         params: "EmulateNetworkConditionsParameters",
         session_id: Optional[str] = None,
     ) -> "Dict[str, Any]":
-        """Activates emulation of network conditions."""
+        """Activates emulation of network conditions. This command is deprecated in favor of the emulateNetworkConditionsByRule
+and overrideNetworkState commands, which can be used together to the same effect."""
         return cast("Dict[str, Any]", await self._client.send_raw(
             method="Network.emulateNetworkConditions",
+            params=params,
+            session_id=session_id,
+        ))
+
+    async def emulateNetworkConditionsByRule(
+        self,
+        params: "EmulateNetworkConditionsByRuleParameters",
+        session_id: Optional[str] = None,
+    ) -> "EmulateNetworkConditionsByRuleReturns":
+        """Activates emulation of network conditions for individual requests using URL match patterns. Unlike the deprecated
+Network.emulateNetworkConditions this method does not affect `navigator` state. Use Network.overrideNetworkState to
+explicitly modify `navigator` behavior."""
+        return cast("EmulateNetworkConditionsByRuleReturns", await self._client.send_raw(
+            method="Network.emulateNetworkConditionsByRule",
+            params=params,
+            session_id=session_id,
+        ))
+
+    async def overrideNetworkState(
+        self,
+        params: "OverrideNetworkStateParameters",
+        session_id: Optional[str] = None,
+    ) -> "Dict[str, Any]":
+        """Override the state of navigator.onLine and navigator.connection."""
+        return cast("Dict[str, Any]", await self._client.send_raw(
+            method="Network.overrideNetworkState",
             params=params,
             session_id=session_id,
         ))
@@ -203,6 +237,20 @@ Deprecated, use Fetch.continueRequest, Fetch.fulfillRequest and Fetch.failReques
         """Enables network tracking, network events will now be delivered to the client."""
         return cast("Dict[str, Any]", await self._client.send_raw(
             method="Network.enable",
+            params=params,
+            session_id=session_id,
+        ))
+
+    async def configureDurableMessages(
+        self,
+        params: Optional["ConfigureDurableMessagesParameters"] = None,
+        session_id: Optional[str] = None,
+    ) -> "Dict[str, Any]":
+        """Configures storing response bodies outside of renderer, so that these survive
+a cross-process navigation.
+If maxTotalBufferSize is not set, durable messages are disabled."""
+        return cast("Dict[str, Any]", await self._client.send_raw(
+            method="Network.configureDurableMessages",
             params=params,
             session_id=session_id,
         ))
@@ -325,7 +373,7 @@ attribute, user, password."""
 
     async def setBlockedURLs(
         self,
-        params: "SetBlockedURLsParameters",
+        params: Optional["SetBlockedURLsParameters"] = None,
         session_id: Optional[str] = None,
     ) -> "Dict[str, Any]":
         """Blocks URLs from loading."""
@@ -466,6 +514,30 @@ If enabled, the dataReceived event contains the data that was received during st
 Enabling triggers 'reportingApiReportAdded' for all existing reports."""
         return cast("Dict[str, Any]", await self._client.send_raw(
             method="Network.enableReportingApi",
+            params=params,
+            session_id=session_id,
+        ))
+
+    async def enableDeviceBoundSessions(
+        self,
+        params: "EnableDeviceBoundSessionsParameters",
+        session_id: Optional[str] = None,
+    ) -> "Dict[str, Any]":
+        """Sets up tracking device bound sessions and fetching of initial set of sessions."""
+        return cast("Dict[str, Any]", await self._client.send_raw(
+            method="Network.enableDeviceBoundSessions",
+            params=params,
+            session_id=session_id,
+        ))
+
+    async def fetchSchemefulSite(
+        self,
+        params: "FetchSchemefulSiteParameters",
+        session_id: Optional[str] = None,
+    ) -> "FetchSchemefulSiteReturns":
+        """Fetches the schemeful site for a specific origin."""
+        return cast("FetchSchemefulSiteReturns", await self._client.send_raw(
+            method="Network.fetchSchemefulSite",
             params=params,
             session_id=session_id,
         ))

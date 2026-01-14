@@ -4,9 +4,8 @@
 
 """CDP BluetoothEmulation Domain Types"""
 
-from typing import List
-from typing_extensions import Literal
-from typing_extensions import TypedDict
+from typing import List, TypedDict
+from typing import Literal
 
 CentralState = Literal["absent", "powered-off", "powered-on"]
 """Indicates the various states of Central."""

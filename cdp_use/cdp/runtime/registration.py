@@ -4,7 +4,8 @@
 
 """CDP Runtime Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -24,121 +25,193 @@ if TYPE_CHECKING:
 class RuntimeRegistration:
     """Event registration interface for Runtime domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Runtime"
+        self._mode = mode  # 'register' or 'unregister'
 
     def bindingCalled(
         self,
-        callback: Callable[['BindingCalledEvent', Optional[str]], None],
+        callback: Union[Callable[['BindingCalledEvent', Optional[str]], None], Callable[['BindingCalledEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for bindingCalled events.
+        Register or unregister a callback for bindingCalled events.
         
         Notification is issued every time when binding is called.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Runtime.bindingCalled", callback)
+        if self._mode == 'register':
+            self._registry.register("Runtime.bindingCalled", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Runtime.bindingCalled", callback)
 
     def consoleAPICalled(
         self,
-        callback: Callable[['ConsoleAPICalledEvent', Optional[str]], None],
+        callback: Union[Callable[['ConsoleAPICalledEvent', Optional[str]], None], Callable[['ConsoleAPICalledEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for consoleAPICalled events.
+        Register or unregister a callback for consoleAPICalled events.
         
         Issued when console API was called.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Runtime.consoleAPICalled", callback)
+        if self._mode == 'register':
+            self._registry.register("Runtime.consoleAPICalled", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Runtime.consoleAPICalled", callback)
 
     def exceptionRevoked(
         self,
-        callback: Callable[['ExceptionRevokedEvent', Optional[str]], None],
+        callback: Union[Callable[['ExceptionRevokedEvent', Optional[str]], None], Callable[['ExceptionRevokedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for exceptionRevoked events.
+        Register or unregister a callback for exceptionRevoked events.
         
         Issued when unhandled exception was revoked.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Runtime.exceptionRevoked", callback)
+        if self._mode == 'register':
+            self._registry.register("Runtime.exceptionRevoked", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Runtime.exceptionRevoked", callback)
 
     def exceptionThrown(
         self,
-        callback: Callable[['ExceptionThrownEvent', Optional[str]], None],
+        callback: Union[Callable[['ExceptionThrownEvent', Optional[str]], None], Callable[['ExceptionThrownEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for exceptionThrown events.
+        Register or unregister a callback for exceptionThrown events.
         
         Issued when exception was thrown and unhandled.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Runtime.exceptionThrown", callback)
+        if self._mode == 'register':
+            self._registry.register("Runtime.exceptionThrown", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Runtime.exceptionThrown", callback)
 
     def executionContextCreated(
         self,
-        callback: Callable[['ExecutionContextCreatedEvent', Optional[str]], None],
+        callback: Union[Callable[['ExecutionContextCreatedEvent', Optional[str]], None], Callable[['ExecutionContextCreatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for executionContextCreated events.
+        Register or unregister a callback for executionContextCreated events.
         
         Issued when new execution context is created.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Runtime.executionContextCreated", callback)
+        if self._mode == 'register':
+            self._registry.register("Runtime.executionContextCreated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Runtime.executionContextCreated", callback)
 
     def executionContextDestroyed(
         self,
-        callback: Callable[['ExecutionContextDestroyedEvent', Optional[str]], None],
+        callback: Union[Callable[['ExecutionContextDestroyedEvent', Optional[str]], None], Callable[['ExecutionContextDestroyedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for executionContextDestroyed events.
+        Register or unregister a callback for executionContextDestroyed events.
         
         Issued when execution context is destroyed.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Runtime.executionContextDestroyed", callback)
+        if self._mode == 'register':
+            self._registry.register("Runtime.executionContextDestroyed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Runtime.executionContextDestroyed", callback)
 
     def executionContextsCleared(
         self,
-        callback: Callable[['ExecutionContextsClearedEvent', Optional[str]], None],
+        callback: Union[Callable[['ExecutionContextsClearedEvent', Optional[str]], None], Callable[['ExecutionContextsClearedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for executionContextsCleared events.
+        Register or unregister a callback for executionContextsCleared events.
         
         Issued when all executionContexts were cleared in browser
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Runtime.executionContextsCleared", callback)
+        if self._mode == 'register':
+            self._registry.register("Runtime.executionContextsCleared", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Runtime.executionContextsCleared", callback)
 
     def inspectRequested(
         self,
-        callback: Callable[['InspectRequestedEvent', Optional[str]], None],
+        callback: Union[Callable[['InspectRequestedEvent', Optional[str]], None], Callable[['InspectRequestedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for inspectRequested events.
+        Register or unregister a callback for inspectRequested events.
         
         Issued when object should be inspected (for example, as a result of inspect() command line API
 call).
@@ -146,6 +219,15 @@ call).
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Runtime.inspectRequested", callback)
+        if self._mode == 'register':
+            self._registry.register("Runtime.inspectRequested", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Runtime.inspectRequested", callback)
 

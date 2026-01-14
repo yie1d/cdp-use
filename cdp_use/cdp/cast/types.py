@@ -4,7 +4,7 @@
 
 """CDP Cast Domain Types"""
 
-from typing_extensions import NotRequired, TypedDict
+from typing import NotRequired, TypedDict
 
 class Sink(TypedDict):
     name: "str"

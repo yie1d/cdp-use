@@ -4,7 +4,8 @@
 
 """CDP Fetch Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,16 +16,18 @@ if TYPE_CHECKING:
 class FetchRegistration:
     """Event registration interface for Fetch domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Fetch"
+        self._mode = mode  # 'register' or 'unregister'
 
     def requestPaused(
         self,
-        callback: Callable[['RequestPausedEvent', Optional[str]], None],
+        callback: Union[Callable[['RequestPausedEvent', Optional[str]], None], Callable[['RequestPausedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for requestPaused events.
+        Register or unregister a callback for requestPaused events.
         
         Issued when the domain is enabled and the request URL matches the
 specified filter. The request is paused until the client responds
@@ -41,15 +44,25 @@ have `redirectedRequestId` field set.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Fetch.requestPaused", callback)
+        if self._mode == 'register':
+            self._registry.register("Fetch.requestPaused", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Fetch.requestPaused", callback)
 
     def authRequired(
         self,
-        callback: Callable[['AuthRequiredEvent', Optional[str]], None],
+        callback: Union[Callable[['AuthRequiredEvent', Optional[str]], None], Callable[['AuthRequiredEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for authRequired events.
+        Register or unregister a callback for authRequired events.
         
         Issued when the domain is enabled with handleAuthRequests set to true.
 The request is paused until client responds with continueWithAuth.
@@ -57,6 +70,15 @@ The request is paused until client responds with continueWithAuth.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Fetch.authRequired", callback)
+        if self._mode == 'register':
+            self._registry.register("Fetch.authRequired", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Fetch.authRequired", callback)
 

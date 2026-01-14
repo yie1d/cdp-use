@@ -4,7 +4,8 @@
 
 """CDP Browser Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,37 +16,58 @@ if TYPE_CHECKING:
 class BrowserRegistration:
     """Event registration interface for Browser domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Browser"
+        self._mode = mode  # 'register' or 'unregister'
 
     def downloadWillBegin(
         self,
-        callback: Callable[['DownloadWillBeginEvent', Optional[str]], None],
+        callback: Union[Callable[['DownloadWillBeginEvent', Optional[str]], None], Callable[['DownloadWillBeginEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for downloadWillBegin events.
+        Register or unregister a callback for downloadWillBegin events.
         
         Fired when page is about to start a download.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Browser.downloadWillBegin", callback)
+        if self._mode == 'register':
+            self._registry.register("Browser.downloadWillBegin", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Browser.downloadWillBegin", callback)
 
     def downloadProgress(
         self,
-        callback: Callable[['DownloadProgressEvent', Optional[str]], None],
+        callback: Union[Callable[['DownloadProgressEvent', Optional[str]], None], Callable[['DownloadProgressEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for downloadProgress events.
+        Register or unregister a callback for downloadProgress events.
         
         Fired when download makes progress. Last call has |done| == true.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Browser.downloadProgress", callback)
+        if self._mode == 'register':
+            self._registry.register("Browser.downloadProgress", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Browser.downloadProgress", callback)
 

@@ -4,27 +4,30 @@
 
 """CDP Media Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..registry import EventRegistry
-    from .events import PlayerErrorsRaisedEvent, PlayerEventsAddedEvent, PlayerMessagesLoggedEvent, PlayerPropertiesChangedEvent, PlayersCreatedEvent
+    from .events import PlayerCreatedEvent, PlayerErrorsRaisedEvent, PlayerEventsAddedEvent, PlayerMessagesLoggedEvent, PlayerPropertiesChangedEvent
 
 class MediaRegistration:
     """Event registration interface for Media domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Media"
+        self._mode = mode  # 'register' or 'unregister'
 
     def playerPropertiesChanged(
         self,
-        callback: Callable[['PlayerPropertiesChangedEvent', Optional[str]], None],
+        callback: Union[Callable[['PlayerPropertiesChangedEvent', Optional[str]], None], Callable[['PlayerPropertiesChangedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for playerPropertiesChanged events.
+        Register or unregister a callback for playerPropertiesChanged events.
         
         This can be called multiple times, and can be used to set / override /
 remove player properties. A null propValue indicates removal.
@@ -32,15 +35,25 @@ remove player properties. A null propValue indicates removal.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Media.playerPropertiesChanged", callback)
+        if self._mode == 'register':
+            self._registry.register("Media.playerPropertiesChanged", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Media.playerPropertiesChanged", callback)
 
     def playerEventsAdded(
         self,
-        callback: Callable[['PlayerEventsAddedEvent', Optional[str]], None],
+        callback: Union[Callable[['PlayerEventsAddedEvent', Optional[str]], None], Callable[['PlayerEventsAddedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for playerEventsAdded events.
+        Register or unregister a callback for playerEventsAdded events.
         
         Send events as a list, allowing them to be batched on the browser for less
 congestion. If batched, events must ALWAYS be in chronological order.
@@ -48,53 +61,92 @@ congestion. If batched, events must ALWAYS be in chronological order.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Media.playerEventsAdded", callback)
+        if self._mode == 'register':
+            self._registry.register("Media.playerEventsAdded", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Media.playerEventsAdded", callback)
 
     def playerMessagesLogged(
         self,
-        callback: Callable[['PlayerMessagesLoggedEvent', Optional[str]], None],
+        callback: Union[Callable[['PlayerMessagesLoggedEvent', Optional[str]], None], Callable[['PlayerMessagesLoggedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for playerMessagesLogged events.
+        Register or unregister a callback for playerMessagesLogged events.
         
         Send a list of any messages that need to be delivered.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Media.playerMessagesLogged", callback)
+        if self._mode == 'register':
+            self._registry.register("Media.playerMessagesLogged", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Media.playerMessagesLogged", callback)
 
     def playerErrorsRaised(
         self,
-        callback: Callable[['PlayerErrorsRaisedEvent', Optional[str]], None],
+        callback: Union[Callable[['PlayerErrorsRaisedEvent', Optional[str]], None], Callable[['PlayerErrorsRaisedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for playerErrorsRaised events.
+        Register or unregister a callback for playerErrorsRaised events.
         
         Send a list of any errors that need to be delivered.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Media.playerErrorsRaised", callback)
+        if self._mode == 'register':
+            self._registry.register("Media.playerErrorsRaised", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Media.playerErrorsRaised", callback)
 
-    def playersCreated(
+    def playerCreated(
         self,
-        callback: Callable[['PlayersCreatedEvent', Optional[str]], None],
+        callback: Union[Callable[['PlayerCreatedEvent', Optional[str]], None], Callable[['PlayerCreatedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for playersCreated events.
+        Register or unregister a callback for playerCreated events.
         
         Called whenever a player is created, or when a new agent joins and receives
-a list of active players. If an agent is restored, it will receive the full
-list of player ids and all events again.
+a list of active players. If an agent is restored, it will receive one
+event for each active player.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Media.playersCreated", callback)
+        if self._mode == 'register':
+            self._registry.register("Media.playerCreated", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Media.playerCreated", callback)
 

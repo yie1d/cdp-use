@@ -4,7 +4,7 @@
 
 """CDP BluetoothEmulation Domain Events"""
 
-from typing_extensions import NotRequired, TypedDict
+from typing import NotRequired, TypedDict
 
 from typing import TYPE_CHECKING
 

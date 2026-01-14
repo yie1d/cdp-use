@@ -4,8 +4,7 @@
 
 """CDP IndexedDB Domain Commands"""
 
-from typing import List
-from typing_extensions import NotRequired, TypedDict
+from typing import List, NotRequired, TypedDict
 
 from typing import TYPE_CHECKING
 
@@ -76,8 +75,8 @@ Security origin."""
     """Database name."""
     objectStoreName: "str"
     """Object store name."""
-    indexName: "str"
-    """Index name, empty string for object store data requests."""
+    indexName: "NotRequired[str]"
+    """Index name. If not specified, it performs an object store data request."""
     skipCount: "int"
     """Number of records to skip."""
     pageSize: "int"

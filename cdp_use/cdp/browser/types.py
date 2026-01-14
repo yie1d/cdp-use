@@ -4,9 +4,8 @@
 
 """CDP Browser Domain Types"""
 
-from typing import List
-from typing_extensions import Literal
-from typing_extensions import NotRequired, TypedDict
+from typing import List, NotRequired, TypedDict
+from typing import Literal
 
 BrowserContextID = str
 
@@ -37,7 +36,7 @@ class Bounds(TypedDict, total=False):
 
 
 
-PermissionType = Literal["ar", "audioCapture", "automaticFullscreen", "backgroundFetch", "backgroundSync", "cameraPanTiltZoom", "capturedSurfaceControl", "clipboardReadWrite", "clipboardSanitizedWrite", "displayCapture", "durableStorage", "geolocation", "handTracking", "idleDetection", "keyboardLock", "localFonts", "localNetworkAccess", "midi", "midiSysex", "nfc", "notifications", "paymentHandler", "periodicBackgroundSync", "pointerLock", "protectedMediaIdentifier", "sensors", "smartCard", "speakerSelection", "storageAccess", "topLevelStorageAccess", "videoCapture", "vr", "wakeLockScreen", "wakeLockSystem", "webAppInstallation", "webPrinting", "windowManagement"]
+PermissionType = Literal["ar", "audioCapture", "automaticFullscreen", "backgroundFetch", "backgroundSync", "cameraPanTiltZoom", "capturedSurfaceControl", "clipboardReadWrite", "clipboardSanitizedWrite", "displayCapture", "durableStorage", "geolocation", "handTracking", "idleDetection", "keyboardLock", "localFonts", "localNetwork", "localNetworkAccess", "loopbackNetwork", "midi", "midiSysex", "nfc", "notifications", "paymentHandler", "periodicBackgroundSync", "pointerLock", "protectedMediaIdentifier", "sensors", "smartCard", "speakerSelection", "storageAccess", "topLevelStorageAccess", "videoCapture", "vr", "wakeLockScreen", "wakeLockSystem", "webAppInstallation", "webPrinting", "windowManagement"]
 
 
 

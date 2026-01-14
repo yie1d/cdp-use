@@ -4,7 +4,8 @@
 
 """CDP HeapProfiler Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,44 +16,66 @@ if TYPE_CHECKING:
 class HeapProfilerRegistration:
     """Event registration interface for HeapProfiler domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "HeapProfiler"
+        self._mode = mode  # 'register' or 'unregister'
 
     def addHeapSnapshotChunk(
         self,
-        callback: Callable[['AddHeapSnapshotChunkEvent', Optional[str]], None],
+        callback: Union[Callable[['AddHeapSnapshotChunkEvent', Optional[str]], None], Callable[['AddHeapSnapshotChunkEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for addHeapSnapshotChunk events.
+        Register or unregister a callback for addHeapSnapshotChunk events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("HeapProfiler.addHeapSnapshotChunk", callback)
+        if self._mode == 'register':
+            self._registry.register("HeapProfiler.addHeapSnapshotChunk", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("HeapProfiler.addHeapSnapshotChunk", callback)
 
     def heapStatsUpdate(
         self,
-        callback: Callable[['HeapStatsUpdateEvent', Optional[str]], None],
+        callback: Union[Callable[['HeapStatsUpdateEvent', Optional[str]], None], Callable[['HeapStatsUpdateEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for heapStatsUpdate events.
+        Register or unregister a callback for heapStatsUpdate events.
         
         If heap objects tracking has been started then backend may send update for one or more fragments
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("HeapProfiler.heapStatsUpdate", callback)
+        if self._mode == 'register':
+            self._registry.register("HeapProfiler.heapStatsUpdate", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("HeapProfiler.heapStatsUpdate", callback)
 
     def lastSeenObjectId(
         self,
-        callback: Callable[['LastSeenObjectIdEvent', Optional[str]], None],
+        callback: Union[Callable[['LastSeenObjectIdEvent', Optional[str]], None], Callable[['LastSeenObjectIdEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for lastSeenObjectId events.
+        Register or unregister a callback for lastSeenObjectId events.
         
         If heap objects tracking has been started then backend regularly sends a current value for last
 seen object id and corresponding timestamp. If the were changes in the heap since last event
@@ -61,32 +84,61 @@ then one or more heapStatsUpdate events will be sent before a new lastSeenObject
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("HeapProfiler.lastSeenObjectId", callback)
+        if self._mode == 'register':
+            self._registry.register("HeapProfiler.lastSeenObjectId", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("HeapProfiler.lastSeenObjectId", callback)
 
     def reportHeapSnapshotProgress(
         self,
-        callback: Callable[['ReportHeapSnapshotProgressEvent', Optional[str]], None],
+        callback: Union[Callable[['ReportHeapSnapshotProgressEvent', Optional[str]], None], Callable[['ReportHeapSnapshotProgressEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for reportHeapSnapshotProgress events.
+        Register or unregister a callback for reportHeapSnapshotProgress events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("HeapProfiler.reportHeapSnapshotProgress", callback)
+        if self._mode == 'register':
+            self._registry.register("HeapProfiler.reportHeapSnapshotProgress", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("HeapProfiler.reportHeapSnapshotProgress", callback)
 
     def resetProfiles(
         self,
-        callback: Callable[['ResetProfilesEvent', Optional[str]], None],
+        callback: Union[Callable[['ResetProfilesEvent', Optional[str]], None], Callable[['ResetProfilesEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for resetProfiles events.
+        Register or unregister a callback for resetProfiles events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("HeapProfiler.resetProfiles", callback)
+        if self._mode == 'register':
+            self._registry.register("HeapProfiler.resetProfiles", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("HeapProfiler.resetProfiles", callback)
 

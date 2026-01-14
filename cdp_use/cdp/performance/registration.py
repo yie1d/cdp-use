@@ -4,7 +4,8 @@
 
 """CDP Performance Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,22 +16,33 @@ if TYPE_CHECKING:
 class PerformanceRegistration:
     """Event registration interface for Performance domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "Performance"
+        self._mode = mode  # 'register' or 'unregister'
 
     def metrics(
         self,
-        callback: Callable[['MetricsEvent', Optional[str]], None],
+        callback: Union[Callable[['MetricsEvent', Optional[str]], None], Callable[['MetricsEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for metrics events.
+        Register or unregister a callback for metrics events.
         
         Current values of the metrics.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("Performance.metrics", callback)
+        if self._mode == 'register':
+            self._registry.register("Performance.metrics", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("Performance.metrics", callback)
 

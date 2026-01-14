@@ -53,7 +53,7 @@ class CDPGenerator:
 
         for file_path in protocol_files:
             print(f"Loading protocol file: {file_path}")
-            with open(file_path, "r") as f:
+            with open(file_path, "r", encoding='utf8') as f:
                 protocol = json.load(f)
 
             for domain in protocol.get("domains", []):
@@ -233,7 +233,7 @@ class CDPGenerator:
 
     def write_file(self, path: Path, content: str) -> None:
         """Write content to a file."""
-        with open(path, "w") as f:
+        with open(path, "w", encoding='utf8') as f:
             f.write(content)
 
 

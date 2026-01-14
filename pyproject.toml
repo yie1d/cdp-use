@@ -1,5 +1,5 @@
 [project]
-name = "cdp-use"
+name = "cdp-use-jrpa"
 version = "1.4.4"
 description = "Type safe generator/client library for CDP"
 readme = "README.md"

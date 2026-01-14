@@ -4,7 +4,7 @@
 
 """CDP EventBreakpoints Domain Commands"""
 
-from typing_extensions import TypedDict
+from typing import TypedDict
 
 class SetInstrumentationBreakpointParameters(TypedDict):
     eventName: "str"

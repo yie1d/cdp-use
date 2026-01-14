@@ -4,7 +4,8 @@
 
 """CDP BackgroundService Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,31 +16,43 @@ if TYPE_CHECKING:
 class BackgroundServiceRegistration:
     """Event registration interface for BackgroundService domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "BackgroundService"
+        self._mode = mode  # 'register' or 'unregister'
 
     def recordingStateChanged(
         self,
-        callback: Callable[['RecordingStateChangedEvent', Optional[str]], None],
+        callback: Union[Callable[['RecordingStateChangedEvent', Optional[str]], None], Callable[['RecordingStateChangedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for recordingStateChanged events.
+        Register or unregister a callback for recordingStateChanged events.
         
         Called when the recording state for the service has been updated.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("BackgroundService.recordingStateChanged", callback)
+        if self._mode == 'register':
+            self._registry.register("BackgroundService.recordingStateChanged", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("BackgroundService.recordingStateChanged", callback)
 
     def backgroundServiceEventReceived(
         self,
-        callback: Callable[['BackgroundServiceEventReceivedEvent', Optional[str]], None],
+        callback: Union[Callable[['BackgroundServiceEventReceivedEvent', Optional[str]], None], Callable[['BackgroundServiceEventReceivedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for backgroundServiceEventReceived events.
+        Register or unregister a callback for backgroundServiceEventReceived events.
         
         Called with all existing backgroundServiceEvents when enabled, and all new
 events afterwards if enabled and recording.
@@ -47,6 +60,15 @@ events afterwards if enabled and recording.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("BackgroundService.backgroundServiceEventReceived", callback)
+        if self._mode == 'register':
+            self._registry.register("BackgroundService.backgroundServiceEventReceived", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("BackgroundService.backgroundServiceEventReceived", callback)
 

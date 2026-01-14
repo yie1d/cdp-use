@@ -4,9 +4,8 @@
 
 """CDP PWA Domain Types"""
 
-from typing import List
-from typing_extensions import Literal
-from typing_extensions import TypedDict
+from typing import List, TypedDict
+from typing import Literal
 
 class FileHandlerAccept(TypedDict):
     """The following types are the replica of

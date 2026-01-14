@@ -4,8 +4,7 @@
 
 """CDP Tracing Domain Commands"""
 
-from typing import List
-from typing_extensions import TypedDict
+from typing import List, TypedDict
 
 from typing import TYPE_CHECKING
 
@@ -19,6 +18,12 @@ if TYPE_CHECKING:
 class GetCategoriesReturns(TypedDict):
     categories: "List[str]"
     """A list of supported tracing categories."""
+
+
+
+class GetTrackEventDescriptorReturns(TypedDict):
+    descriptor: "str"
+    """Base64-encoded serialized perfetto.protos.TrackEventDescriptor protobuf message. (Encoded as a base64 string when passed over JSON)"""
 
 
 

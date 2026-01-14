@@ -4,8 +4,12 @@
 
 """CDP Media Domain Types"""
 
-from typing import Any, Dict, List
-from typing_extensions import TypedDict
+from typing import Any, Dict, List, NotRequired, TypedDict
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..dom.types import BackendNodeId
 
 PlayerId = str
 """Players will get an ID that is unique within the agent context."""
@@ -73,3 +77,9 @@ as PipelineStatusCodes in media/base/pipeline_status.h"""
 caused by an WindowsError"""
     data: "Dict[str, Any]"
     """Extra data attached to an error, such as an HRESULT, Video Codec, etc."""
+
+
+
+class Player(TypedDict):
+    playerId: "PlayerId"
+    domNodeId: "NotRequired[BackendNodeId]"

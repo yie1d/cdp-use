@@ -4,7 +4,8 @@
 
 """CDP FedCm Domain Event Registration"""
 
-from typing import Callable, Optional
+from collections.abc import Awaitable
+from typing import Callable, Optional, Union
 
 from typing import TYPE_CHECKING
 
@@ -15,29 +16,41 @@ if TYPE_CHECKING:
 class FedCmRegistration:
     """Event registration interface for FedCm domain."""
 
-    def __init__(self, registry: 'EventRegistry'):
+    def __init__(self, registry: 'EventRegistry', mode: str = 'register'):
         self._registry = registry
         self._domain = "FedCm"
+        self._mode = mode  # 'register' or 'unregister'
 
     def dialogShown(
         self,
-        callback: Callable[['DialogShownEvent', Optional[str]], None],
+        callback: Union[Callable[['DialogShownEvent', Optional[str]], None], Callable[['DialogShownEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for dialogShown events.
+        Register or unregister a callback for dialogShown events.
         
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("FedCm.dialogShown", callback)
+        if self._mode == 'register':
+            self._registry.register("FedCm.dialogShown", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("FedCm.dialogShown", callback)
 
     def dialogClosed(
         self,
-        callback: Callable[['DialogClosedEvent', Optional[str]], None],
+        callback: Union[Callable[['DialogClosedEvent', Optional[str]], None], Callable[['DialogClosedEvent', Optional[str]], Awaitable[None]]],
+        once: bool = False,
     ) -> None:
         """
-        Register a callback for dialogClosed events.
+        Register or unregister a callback for dialogClosed events.
         
         Triggered when a dialog is closed, either by user action, JS abort,
 or a command below.
@@ -45,6 +58,15 @@ or a command below.
         Args:
             callback: Function to call when event occurs.
                      Receives (event_data, session_id) as parameters.
+            once: If True, callback will be removed after first execution (register mode only).
+        
+        Note:
+            The behavior depends on the mode:
+            - register mode: Adds the callback
+            - unregister mode: Removes the callback (once parameter is ignored)
         """
-        self._registry.register("FedCm.dialogClosed", callback)
+        if self._mode == 'register':
+            self._registry.register("FedCm.dialogClosed", callback, once)
+        else:  # unregister mode
+            self._registry.unregister("FedCm.dialogClosed", callback)
 
